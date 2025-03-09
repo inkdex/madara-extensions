@@ -4,7 +4,7 @@ Paperback extensions for websites which use the generic Madara theme.
 
 ## Available Extensions
 
-None at this moment.
+- [Toonily](https://toonily.com/)
 
 ## Installation
 
