@@ -1,0 +1,20 @@
+import { MadaraGeneric } from "../generic/Madara";
+import { MangaReadOrgParser } from "./parser";
+import pbconfig from "./pbconfig";
+
+const DOMAIN: string = "https://www.mangaread.org";
+
+class MangaReadOrgExtension extends MadaraGeneric {
+    constructor() {
+        super({
+            domain: DOMAIN,
+            name: pbconfig.name,
+            contentRating: pbconfig.contentRating,
+            language: pbconfig.language,
+            usePostIds: true,
+            parser: new MangaReadOrgParser(),
+        });
+    }
+}
+
+export const MangaReadOrg = new MangaReadOrgExtension();
