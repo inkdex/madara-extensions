@@ -3,7 +3,7 @@ import { ContentRating, SourceInfo, SourceIntents } from "@paperback/types";
 export default {
     name: "MangaZin",
     description: "Extension that pulls content from mangazin.org.",
-    version: "1.0.0-alpha.1",
+    version: "1.0.0-alpha.2",
     icon: "icon.png",
     language: "🇬🇧",
     contentRating: ContentRating.MATURE,

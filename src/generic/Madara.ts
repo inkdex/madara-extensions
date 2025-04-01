@@ -33,15 +33,75 @@ import { MadaraInterceptor } from "./MadaraInterceptor";
 import { MadaraParser } from "./MadaraParser";
 import { getUsePostIds, MadaraSettings } from "./MadaraSettings";
 
-const BASE_VERSION = "1.0.0";
-export const getExportVersion = (EXTENSION_VERSION: string): string => {
-    return BASE_VERSION.split(".")
-        .map(
-            (x, index) =>
-                Number(x) + Number(EXTENSION_VERSION.split(".")[index]),
-        )
-        .join(".");
-};
+const BASE_VERSION = "1.0.0-alpha.2";
+
+export function getVersion(
+    options?:
+        | {
+              increaseMajor?: number;
+              increaseMinor?: number;
+              increasePatch?: number;
+          }
+        | {
+              increasePrerelease: number;
+          },
+): string {
+    if (!options) {
+        return BASE_VERSION;
+    }
+
+    const baseParts = BASE_VERSION.split("-");
+    const versionNumbers = baseParts[0].split(".").map(Number);
+    const isPrerelease = baseParts.length > 1;
+
+    if (versionNumbers.length < 3) {
+        throw new Error(
+            `Invalid BASE_VERSION: '${BASE_VERSION}'. Expected format: 'X.Y.Z' or 'X.Y.Z-prerelease.N'`,
+        );
+    }
+
+    if ("increasePrerelease" in options) {
+        if (!isPrerelease) {
+            throw new Error(
+                "Cannot set a prerelease number on a stable version.",
+            );
+        }
+
+        const prereleaseParts = baseParts[1].split(".");
+        if (prereleaseParts.length < 2 || isNaN(Number(prereleaseParts[1]))) {
+            throw new Error(
+                `Invalid prerelease format in BASE_VERSION: '${BASE_VERSION}'. Expected format: 'X.Y.Z-prerelease.N'`,
+            );
+        }
+
+        const newPrereleaseNum =
+            Number(prereleaseParts[1]) + options.increasePrerelease;
+        return `${baseParts[0]}-${prereleaseParts[0]}.${newPrereleaseNum}`;
+    }
+
+    if (isPrerelease) {
+        throw new Error(
+            "BASE_VERSION is a prerelease. Use increasePrerelease option instead.",
+        );
+    }
+
+    const hasVersionIncrement =
+        options.increaseMajor !== undefined ||
+        options.increaseMinor !== undefined ||
+        options.increasePatch !== undefined;
+
+    if (!hasVersionIncrement) {
+        throw new Error(
+            "Empty options object provided. Either specify version increments or call getVersion() with no arguments.",
+        );
+    }
+
+    const newMajor = versionNumbers[0] + (options.increaseMajor || 0);
+    const newMinor = versionNumbers[1] + (options.increaseMinor || 0);
+    const newPatch = versionNumbers[2] + (options.increasePatch || 0);
+
+    return `${newMajor}.${newMinor}.${newPatch}`;
+}
 
 export interface GenericParams {
     name: string;
@@ -535,7 +595,9 @@ export abstract class MadaraGeneric
     }
 
     async slugToPostId(slug: string): Promise<string> {
-        if ((await Application.getState(slug)) == null) {
+        const postIdState = Application.getState(slug) as string;
+
+        if (!postIdState || postIdState == null) {
             const postId = await this.convertSlugToPostId(slug);
 
             const existingMappedSlug = await Application.getState(postId);
@@ -547,7 +609,8 @@ export abstract class MadaraGeneric
             Application.setState(slug, postId);
         }
 
-        const postId = (await Application.getState(slug)) as string;
+        const postId = Application.getState(slug) as string;
+
         if (!postId) throw new Error(`Unable to fetch postId for slug:${slug}`);
 
         return postId;
@@ -589,14 +652,16 @@ export abstract class MadaraGeneric
             method: "HEAD",
         });
 
-        let postId: string = "";
+        let postId;
 
-        const postIdRegex = headResponse?.headers["Link"]?.match(/\?p=(\d+)/);
+        const postIdRegex = headResponse?.headers?.["link"]?.match(/\?p=(\d+)/);
         if (postIdRegex && postIdRegex[1]) postId = postIdRegex[1];
-        if (postId || !isNaN(Number(postId))) {
-            return postId?.toString();
+        if (postId && !isNaN(Number(postId))) {
+            // If postId AND is a number, return the postId
+            return postId;
         }
 
+        // Move on to the alternative method of parsing
         const [, buffer] = await Application.scheduleRequest({
             url: `${this.domain}/temp_dirpath/${slug}`,
             method: "GET",
@@ -605,26 +670,25 @@ export abstract class MadaraGeneric
         const $ = cheerio.load(Application.arrayBufferToUTF8String(buffer));
 
         // Step 1: Try to get postId from shortlink
-        postId =
-            $('link[rel="shortlink"]')?.attr("href")?.split("/?p=")[1] ?? "";
+        postId = $('link[rel="shortlink"]')?.attr("href")?.split("/?p=")[1];
 
         // Step 2: If no number has been found, try to parse from data-post
         if (isNaN(Number(postId))) {
-            postId = $("a.wp-manga-action-button").attr("data-post") ?? "";
+            postId = $("a.wp-manga-action-button").attr("data-post");
         }
 
         // Step 3: If no number has been found, try to parse from manga script
         if (isNaN(Number(postId))) {
             const page = $.root().html();
-            const match = page?.match(/manga_id.*\D(\d+)/);
+            const match = page?.match(/manga_id["']?\s*:\s*["']?(\d+)/);
             if (match && match[1]) {
                 postId = match[1]?.trim();
             }
         }
 
-        if (isNaN(Number(postId))) {
+        if (!postId || isNaN(Number(postId))) {
             throw new Error(
-                `Unable to fetch numeric postId for this item! | slug:${slug}`,
+                `Unable to fetch numeric postId for this item! (slug:${slug})`,
             );
         }
 

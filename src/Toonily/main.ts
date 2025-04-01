@@ -19,7 +19,7 @@ class ToonilyExtension extends MadaraGeneric {
 
     override constructSearchRequest(page: number, query: SearchQuery) {
         const urlBuilder = new URL(this.domain)
-            .setPath(
+            .addPathComponent(
                 `search${query?.title ? encodeURIComponent(this.sanitizeQuery(query?.title ?? "")) + "/" : ""}/page/${page.toString()}`,
             )
             .setQueryItem("post_type", "wp-manga");
