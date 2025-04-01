@@ -11,6 +11,7 @@ class ArthurScanExtension extends MadaraGeneric {
             contentRating: pbconfig.contentRating,
             language: pbconfig.language,
             usePostIds: true,
+            chapterEndpoint: 1,
         });
     }
 }
