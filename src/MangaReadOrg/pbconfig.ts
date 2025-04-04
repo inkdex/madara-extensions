@@ -3,7 +3,7 @@ import { ContentRating, SourceInfo, SourceIntents } from "@paperback/types";
 export default {
     name: "MangaReadOrg",
     description: "Extension that pulls content from mangaread.org.",
-    version: "1.0.0-alpha.4",
+    version: "1.0.0-alpha.5",
     icon: "icon.png",
     language: "🇬🇧",
     contentRating: ContentRating.EVERYONE,

@@ -13,7 +13,6 @@ class MangaReadOrgExtension extends MadaraGeneric {
             language: pbconfig.language,
             usePostIds: true,
             parser: new MangaReadOrgParser(),
-            chapterEndpoint: 1,
         });
     }
 }
