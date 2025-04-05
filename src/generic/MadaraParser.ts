@@ -140,10 +140,12 @@ export class MadaraParser {
         source: MadaraGeneric,
     ): Chapter[] {
         const chapters: Chapter[] = [];
-        let sortingIndex = 0;
+        const nodeArray = $("li.wp-manga-chapter  ").toArray();
+        let nodesProcessed = 0;
 
         // For each available chapter..
-        for (const obj of $("li.wp-manga-chapter  ").toArray()) {
+        for (const obj of nodeArray) {
+            const sortingIndex = nodeArray.length - nodesProcessed++;
             const id = this.idCleaner($("a", obj).first().attr("href") ?? "");
 
             const chapName = $("a", obj).first().text().trim() ?? "";
@@ -178,7 +180,7 @@ export class MadaraParser {
 
             if (!id || typeof id === "undefined" || id === "#") {
                 console.log(
-                    `Could not parse out ID when getting chapters for postId:${sourceManga.mangaId} parsedId: ${id}`,
+                    `Could not parse out ID when getting chapters for mangaId:${sourceManga.mangaId} parsedId: ${id}`,
                 );
                 continue;
             }
@@ -192,21 +194,9 @@ export class MadaraParser {
                 publishDate: mangaTime,
                 sortingIndex: sortingIndex,
             });
-            sortingIndex--;
         }
 
-        if (chapters.length == 0) {
-            throw new Error(
-                `Couldn't find any chapters for mangaId: ${sourceManga.mangaId}!`,
-            );
-        }
-
-        return chapters.map((chapter) => {
-            if (chapter.sortingIndex) {
-                chapter.sortingIndex += chapters.length;
-            }
-            return chapter;
-        });
+        return chapters;
     }
 
     async parseChapterDetails(
@@ -224,7 +214,7 @@ export class MadaraParser {
             );
             if (!page) {
                 console.log(
-                    `Could not parse pages for postId:${chapter.sourceManga.mangaId} chapterId:${chapter.chapterId}`,
+                    `Could not parse pages for mangaId:${chapter.sourceManga.mangaId} chapterId:${chapter.chapterId}`,
                 );
                 continue;
             }
@@ -258,7 +248,7 @@ export class MadaraParser {
             !("wpmangaprotectornonce" in variables)
         ) {
             throw new Error(
-                `Could not parse page for postId:${chapter.sourceManga.mangaId} chapterId:${chapter.chapterId}. Reason: Lacks sufficient data`,
+                `Could not parse page for mangaId:${chapter.sourceManga.mangaId} chapterId:${chapter.chapterId}. Reason: Lacks sufficient data`,
             );
         }
 

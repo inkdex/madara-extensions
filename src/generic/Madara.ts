@@ -33,76 +33,6 @@ import { MadaraInterceptor } from "./MadaraInterceptor";
 import { MadaraParser } from "./MadaraParser";
 import { getUsePostIds, MadaraSettings } from "./MadaraSettings";
 
-const BASE_VERSION = "1.0.0-alpha.2";
-
-export function getVersion(
-    options?:
-        | {
-              increaseMajor?: number;
-              increaseMinor?: number;
-              increasePatch?: number;
-          }
-        | {
-              increasePrerelease: number;
-          },
-): string {
-    if (!options) {
-        return BASE_VERSION;
-    }
-
-    const baseParts = BASE_VERSION.split("-");
-    const versionNumbers = baseParts[0].split(".").map(Number);
-    const isPrerelease = baseParts.length > 1;
-
-    if (versionNumbers.length < 3) {
-        throw new Error(
-            `Invalid BASE_VERSION: '${BASE_VERSION}'. Expected format: 'X.Y.Z' or 'X.Y.Z-prerelease.N'`,
-        );
-    }
-
-    if ("increasePrerelease" in options) {
-        if (!isPrerelease) {
-            throw new Error(
-                "Cannot set a prerelease number on a stable version.",
-            );
-        }
-
-        const prereleaseParts = baseParts[1].split(".");
-        if (prereleaseParts.length < 2 || isNaN(Number(prereleaseParts[1]))) {
-            throw new Error(
-                `Invalid prerelease format in BASE_VERSION: '${BASE_VERSION}'. Expected format: 'X.Y.Z-prerelease.N'`,
-            );
-        }
-
-        const newPrereleaseNum =
-            Number(prereleaseParts[1]) + options.increasePrerelease;
-        return `${baseParts[0]}-${prereleaseParts[0]}.${newPrereleaseNum}`;
-    }
-
-    if (isPrerelease) {
-        throw new Error(
-            "BASE_VERSION is a prerelease. Use increasePrerelease option instead.",
-        );
-    }
-
-    const hasVersionIncrement =
-        options.increaseMajor !== undefined ||
-        options.increaseMinor !== undefined ||
-        options.increasePatch !== undefined;
-
-    if (!hasVersionIncrement) {
-        throw new Error(
-            "Empty options object provided. Either specify version increments or call getVersion() with no arguments.",
-        );
-    }
-
-    const newMajor = versionNumbers[0] + (options.increaseMajor || 0);
-    const newMinor = versionNumbers[1] + (options.increaseMinor || 0);
-    const newPatch = versionNumbers[2] + (options.increasePatch || 0);
-
-    return `${newMajor}.${newMinor}.${newPatch}`;
-}
-
 export interface GenericParams {
     name: string;
     domain: string;
@@ -291,12 +221,7 @@ export abstract class MadaraGeneric
 
     async getChapters(sourceManga: SourceManga): Promise<Chapter[]> {
         let requestConfig: Request;
-        let mangaId = sourceManga.mangaId;
-
-        if (getUsePostIds(this.usePostIds)) {
-            const postData = await this.convertPostIdToSlug(Number(mangaId));
-            mangaId = postData.slug;
-        }
+        const mangaId = await this.getPostAndSlug(sourceManga.mangaId);
 
         switch (this.chapterEndpoint) {
             case 0:
@@ -308,16 +233,14 @@ export abstract class MadaraGeneric
                     },
                     body: {
                         action: "manga_get_chapters",
-                        manga: getUsePostIds(this.usePostIds)
-                            ? mangaId
-                            : await this.convertSlugToPostId(mangaId),
+                        manga: mangaId.postId,
                     },
                 };
                 break;
 
             case 1:
                 requestConfig = {
-                    url: `${this.domain}/temp_dirpath/${mangaId}/ajax/chapters`,
+                    url: `${this.domain}/temp_dirpath/${mangaId.slug}/ajax/chapters`,
                     method: "POST",
                     headers: {
                         "content-type": "application/x-www-form-urlencoded",
@@ -327,7 +250,7 @@ export abstract class MadaraGeneric
 
             case 2:
                 requestConfig = {
-                    url: `${this.domain}/temp_dirpath/${mangaId}`,
+                    url: `${this.domain}/temp_dirpath/${mangaId.slug}`,
                     method: "POST",
                     headers: {
                         "content-type": "application/x-www-form-urlencoded",
@@ -337,7 +260,7 @@ export abstract class MadaraGeneric
 
             case 3:
                 requestConfig = {
-                    url: `${this.domain}/temp_dirpath/${mangaId}`,
+                    url: `${this.domain}/temp_dirpath/${mangaId.slug}`,
                     method: "GET",
                     headers: {
                         "content-type": "application/x-www-form-urlencoded",
@@ -359,17 +282,11 @@ export abstract class MadaraGeneric
     }
 
     async getChapterDetails(chapter: Chapter): Promise<ChapterDetails> {
-        const mangaId = chapter.sourceManga.mangaId;
+        const mangaId = await this.getPostAndSlug(chapter.sourceManga.mangaId);
         const chapterId = chapter.chapterId;
 
         const url = new URL(this.domain).addPathComponent("temp_dirpath");
-
-        if (getUsePostIds(this.usePostIds)) {
-            const slugData = await this.convertPostIdToSlug(Number(mangaId));
-            url.addPathComponent(slugData.slug);
-        } else {
-            url.addPathComponent(mangaId);
-        }
+        url.addPathComponent(mangaId.slug);
 
         url.addPathComponent(chapterId);
 
@@ -522,10 +439,8 @@ export abstract class MadaraGeneric
 
         for (const result of results) {
             if (getUsePostIds(this.usePostIds)) {
-                const postId = await this.slugToPostId(result.slug); // Slug is not encoded
-
                 items.push({
-                    mangaId: postId,
+                    mangaId: (await this.getPostAndSlug(result.slug)).postId,
                     imageUrl: result.image,
                     title: result.title,
                     subtitle: result.subtitle,
@@ -594,26 +509,51 @@ export abstract class MadaraGeneric
             .trim();
     }
 
-    async slugToPostId(slug: string): Promise<string> {
-        const postIdState = Application.getState(slug) as string;
+    async getPostAndSlug(mangaId: string) {
+        const isPostId = !isNaN(Number(mangaId));
+        let postId: number = 0;
+        let slug: string = "";
 
-        if (!postIdState || postIdState == null) {
-            const postId = await this.convertSlugToPostId(slug);
+        if (!isPostId) {
+            if (getUsePostIds()) {
+                // If provided mangaId is NOT a postId, but a slug AND we care about having the postId
+                const slugInput = mangaId.toString();
 
-            const existingMappedSlug = await Application.getState(postId);
-            if (existingMappedSlug != "") {
-                Application.setState(slug, "");
+                // Fetch postId for slug
+                postId = Application.getState(slugInput) as number;
+
+                // If unable to fetch postId, turn slug into postId
+                if (!postId) {
+                    postId = await this.convertSlugToPostId(slugInput);
+                }
+
+                slug = slugInput;
+            }
+        } else {
+            // If mangaId IS a postId
+            const postIdInput = Number(mangaId);
+
+            // Fetch slug for postId
+            slug = Application.getState(postIdInput.toString()) as string;
+
+            // If unable to fetch slug, turn postId into slug
+            if (!slug) {
+                slug = (await this.convertPostIdToSlug(postIdInput)).slug;
             }
 
-            Application.setState(postId, slug);
-            Application.setState(slug, postId);
+            postId = postIdInput;
         }
 
-        const postId = Application.getState(slug) as string;
+        // We only need to store these if we actually care about them
+        if (getUsePostIds()) {
+            Application.setState(postId.toString(), slug);
+            Application.setState(slug, postId.toString());
+        }
 
-        if (!postId) throw new Error(`Unable to fetch postId for slug:${slug}`);
-
-        return postId;
+        return {
+            postId: postId.toString(),
+            slug: slug,
+        };
     }
 
     async convertPostIdToSlug(postId: number) {
@@ -624,41 +564,44 @@ export abstract class MadaraGeneric
 
         const $ = cheerio.load(Application.arrayBufferToUTF8String(buffer));
 
-        let parseSlug: string;
+        let parseURL: string;
         // Step 1: Try to get slug from og-url
-        parseSlug = $('meta[property="og:url"]').attr("content") ?? "";
+        parseURL = $('meta[property="og:url"]').attr("content") ?? "";
 
         // Step 2: Try to get slug from canonical
-        if (!parseSlug.includes(this.domain)) {
-            parseSlug = $('link[rel="canonical"]').attr("href") ?? "";
+        if (!parseURL.includes(this.domain)) {
+            parseURL = $('link[rel="canonical"]').attr("href") ?? "";
         }
 
-        if (!parseSlug || !parseSlug.includes(this.domain)) {
-            throw new Error("Unable to parse slug!");
+        if (!parseURL.includes(this.domain)) {
+            throw new Error(`Unable to parse slug for postId: ${postId}!`);
         }
 
-        const parseSlugArray = parseSlug.replace(/\/$/, "").split("/");
+        const URLSplit = parseURL.replace(/\/$/, "").split("/");
 
-        const slug: string = parseSlugArray.slice(-1).pop() ?? "";
-        const path: string = parseSlugArray.slice(-2).shift() ?? "";
+        const slug: string = URLSplit.slice(-1).pop() ?? "";
+        const path: string = URLSplit.slice(-2).shift() ?? "";
+
+        if (!slug) {
+            throw new Error(
+                `Unable to fetch slug for this item! postId: ${postId}`,
+            );
+        }
 
         return { path, slug };
     }
 
-    async convertSlugToPostId(slug: string): Promise<string> {
+    async convertSlugToPostId(slug: string): Promise<number> {
         // Credit to the MadaraDex team :-D
         const [headResponse] = await Application.scheduleRequest({
             url: `${this.domain}/temp_dirpath/${slug}`,
             method: "HEAD",
         });
 
-        let postId;
-
         const postIdRegex = headResponse?.headers?.["link"]?.match(/\?p=(\d+)/);
-        if (postIdRegex && postIdRegex[1]) postId = postIdRegex[1];
-        if (postId && !isNaN(Number(postId))) {
-            // If postId AND is a number, return the postId
-            return postId;
+        const postIdMatch = postIdRegex?.[1] ? Number(postIdRegex[1]) : NaN;
+        if (!isNaN(postIdMatch)) {
+            return postIdMatch;
         }
 
         // Move on to the alternative method of parsing
@@ -670,29 +613,38 @@ export abstract class MadaraGeneric
         const $ = cheerio.load(Application.arrayBufferToUTF8String(buffer));
 
         // Step 1: Try to get postId from shortlink
-        postId = $('link[rel="shortlink"]')?.attr("href")?.split("/?p=")[1];
-
-        // Step 2: If no number has been found, try to parse from data-post
-        if (isNaN(Number(postId))) {
-            postId = $("a.wp-manga-action-button").attr("data-post");
-        }
-
-        // Step 3: If no number has been found, try to parse from manga script
-        if (isNaN(Number(postId))) {
-            const page = $.root().html();
-            const match = page?.match(/manga_id["']?\s*:\s*["']?(\d+)/);
-            if (match && match[1]) {
-                postId = match[1]?.trim();
+        const postId_1 = $('link[rel="shortlink"]')
+            ?.attr("href")
+            ?.split("/?p=")[1];
+        if (postId_1) {
+            const postId = Number(postId_1);
+            if (!isNaN(postId)) {
+                return postId;
             }
         }
 
-        if (!postId || isNaN(Number(postId))) {
-            throw new Error(
-                `Unable to fetch numeric postId for this item! (slug:${slug})`,
-            );
+        // Step 2: If no number has been found, try to parse from data-post
+        const postId_2 = $("a.wp-manga-action-button")?.attr("data-post");
+        if (postId_2) {
+            const postId = Number(postId_2);
+            if (!isNaN(postId)) {
+                return postId;
+            }
         }
 
-        return postId;
+        // Step 3: If no number has been found, try to parse from manga script
+        const page = $.root().html();
+        const match = page?.match(/manga_id["']?\s*:\s*["']?(\d+)/);
+        if (match?.[1]) {
+            const postId = Number(match[1]);
+            if (!isNaN(postId)) {
+                return postId;
+            }
+        }
+
+        throw new Error(
+            `Unable to fetch numeric postId for this item! slug:${slug}`,
+        );
     }
 
     async getDirectoryPath(): Promise<string> {

@@ -1,9 +1,10 @@
 import { ContentRating, SourceInfo, SourceIntents } from "@paperback/types";
+import { getVersion } from "../generic/MadaraHelper";
 
 export default {
     name: "DarkScans",
     description: "Extension that pulls content from darkscans.net.",
-    version: "1.0.0-alpha.3",
+    version: getVersion({ increasePrerelease: 1 }),
     icon: "icon.png",
     language: "🇬🇧",
     contentRating: ContentRating.MATURE,

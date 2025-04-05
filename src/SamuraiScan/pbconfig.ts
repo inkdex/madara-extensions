@@ -1,9 +1,10 @@
 import { ContentRating, SourceInfo, SourceIntents } from "@paperback/types";
+import { getVersion } from "../generic/MadaraHelper";
 
 export default {
     name: "SamuraiScan",
     description: "Extension that pulls content from samurai.wordoco.com.",
-    version: "1.0.0-alpha.2",
+    version: getVersion(),
     icon: "icon.png",
     language: "🇪🇸",
     contentRating: ContentRating.MATURE,

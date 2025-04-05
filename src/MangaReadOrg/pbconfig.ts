@@ -1,9 +1,10 @@
 import { ContentRating, SourceInfo, SourceIntents } from "@paperback/types";
+import { getVersion } from "../generic/MadaraHelper";
 
 export default {
     name: "MangaReadOrg",
     description: "Extension that pulls content from mangaread.org.",
-    version: "1.0.0-alpha.5",
+    version: getVersion({ increasePrerelease: 3 }),
     icon: "icon.png",
     language: "🇬🇧",
     contentRating: ContentRating.EVERYONE,

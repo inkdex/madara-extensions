@@ -1,9 +1,10 @@
 import { ContentRating, SourceInfo, SourceIntents } from "@paperback/types";
+import { getVersion } from "../generic/MadaraHelper";
 
 export default {
     name: "MangaOrigines",
     description: "Extension that pulls content from mangas-origines.fr.",
-    version: "1.0.0-alpha.2",
+    version: getVersion(),
     icon: "icon.png",
     language: "🇫🇷",
     contentRating: ContentRating.MATURE,

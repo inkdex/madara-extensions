@@ -1,9 +1,10 @@
 import { ContentRating, SourceInfo, SourceIntents } from "@paperback/types";
+import { getVersion } from "../generic/MadaraHelper";
 
 export default {
     name: "AzoraMoon",
     description: "Extension that pulls content from azoramoon.com.",
-    version: "1.0.0-alpha.2",
+    version: getVersion(),
     icon: "icon.png",
     language: "🇦🇪",
     contentRating: ContentRating.EVERYONE,
