@@ -1,6 +1,7 @@
 import {
     ButtonRow,
     Form,
+    FormSectionElement,
     LabelRow,
     Section,
     ToggleRow,
@@ -49,7 +50,7 @@ export class MadaraSettings extends Form {
         this.source = source;
     }
 
-    override getSections(): Application.FormSectionElement[] {
+    override getSections(): FormSectionElement[] {
         return [
             Section(`${this.source.name} Settings`.replaceAll(" ", ""), [
                 ToggleRow("postIds", {
