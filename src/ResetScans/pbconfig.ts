@@ -3,7 +3,7 @@ import { getVersion } from "../generic/MadaraHelper";
 
 export default {
     name: "ResetScans",
-    description: "Extension that pulls content from reset-scans.co.",
+    description: "Extension that pulls content from reset-scans.org.",
     version: getVersion({ increasePrerelease: 1 }),
     icon: "icon.png",
     language: "🇬🇧",

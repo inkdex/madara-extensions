@@ -1,7 +1,7 @@
 import { MadaraGeneric } from "../generic/Madara";
 import pbconfig from "./pbconfig";
 
-const DOMAIN: string = "https://reset-scans.co";
+const DOMAIN: string = "https://reset-scans.org";
 
 class ResetScansExtension extends MadaraGeneric {
     constructor() {
