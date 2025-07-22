@@ -1,7 +1,7 @@
 import { MadaraGeneric } from "../generic/Madara";
 import pbconfig from "./pbconfig";
 
-const DOMAIN: string = "https://hiperdex.com";
+const DOMAIN: string = "https://hiperdex.tv";
 
 class HiperDexExtension extends MadaraGeneric {
     constructor() {

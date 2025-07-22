@@ -4,7 +4,7 @@ import { getVersion } from "../generic/MadaraHelper";
 export default {
     name: "HiperDex",
     description: "Extension that pulls content from hiperdex.com.",
-    version: getVersion(),
+    version: getVersion({ increasePrerelease: 1 }),
     icon: "icon.png",
     language: "🇬🇧",
     contentRating: ContentRating.ADULT,
