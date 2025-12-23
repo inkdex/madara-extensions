@@ -2,80 +2,71 @@ import { PaperbackInterceptor, Request, Response } from "@paperback/types";
 import { MadaraGeneric } from "./Madara";
 
 export class MadaraInterceptor extends PaperbackInterceptor {
-    source: MadaraGeneric;
-    promise: Promise<string> | undefined;
+  source: MadaraGeneric;
+  promise: Promise<string> | undefined;
 
-    constructor(id: string, source: MadaraGeneric) {
-        super(id);
-        this.source = source;
-    }
+  constructor(id: string, source: MadaraGeneric) {
+    super(id);
+    this.source = source;
+  }
 
-    override async interceptRequest(request: Request): Promise<Request> {
+  override async interceptRequest(request: Request): Promise<Request> {
+    // If it's NOT a directoryRequest
+    if (!request.url.includes("#directoryRequest")) {
+      if (!this.promise) {
         // If it's NOT a directoryRequest
         if (!request.url.includes("#directoryRequest")) {
-            if (!this.promise) {
-                // If it's NOT a directoryRequest
-                if (!request.url.includes("#directoryRequest")) {
-                    if (!this.promise) {
-                        this.promise = this.source.getDirectoryPath();
-                    }
+          if (!this.promise) {
+            this.promise = this.source.getDirectoryPath();
+          }
 
-                    try {
-                        const directoryPath = await this.promise;
-                        request.url = request.url.replace(
-                            "temp_dirpath",
-                            directoryPath,
-                        );
-                    } catch (error: unknown) {
-                        this.promise = undefined;
-                        throw error;
-                    }
-                }
-
-                request.url = request.url.replace("#directoryRequest", "");
-            }
-
-            try {
-                const directoryPath = await this.promise!;
-                request.url = request.url.replace(
-                    "temp_dirpath",
-                    directoryPath,
-                );
-            } catch (error: unknown) {
-                this.promise = undefined;
-                throw error;
-            }
+          try {
+            const directoryPath = await this.promise;
+            request.url = request.url.replace("temp_dirpath", directoryPath);
+          } catch (error: unknown) {
+            this.promise = undefined;
+            throw error;
+          }
         }
 
         request.url = request.url.replace("#directoryRequest", "");
+      }
 
-        request.headers = {
-            ...(request.headers ?? {}),
-            ...{
-                "user-agent": await Application.getDefaultUserAgent(),
-                referer: `${this.source.domain}/`,
-                origin: `${this.source.domain}/`,
-                ...((request.url.includes("wordpress.com") ||
-                    request.url.includes("wp.com")) && {
-                    Accept: "image/avif,image/webp,*/*",
-                }), // Used for images hosted on Wordpress blogs
-            },
-        };
-
-        request.cookies = {
-            ...(request.cookies ?? {}),
-            "toonily-mature": "1",
-            "wpmanga-adault": "1",
-        };
-
-        return request;
+      try {
+        const directoryPath = await this.promise!;
+        request.url = request.url.replace("temp_dirpath", directoryPath);
+      } catch (error: unknown) {
+        this.promise = undefined;
+        throw error;
+      }
     }
 
-    override async interceptResponse(
-        request: Request,
-        response: Response,
-        data: ArrayBuffer,
-    ): Promise<ArrayBuffer> {
-        return data;
-    }
+    request.url = request.url.replace("#directoryRequest", "");
+
+    request.headers = {
+      ...request.headers,
+      "user-agent": await Application.getDefaultUserAgent(),
+      referer: `${this.source.domain}/`,
+      origin: `${this.source.domain}/`,
+      ...((request.url.includes("wordpress.com") || request.url.includes("wp.com")) && {
+        Accept: "image/avif,image/webp,*/*",
+      }),
+    };
+
+    request.cookies = {
+      ...request.cookies,
+      "toonily-mature": "1",
+      "wpmanga-adault": "1",
+    };
+
+    return request;
+  }
+
+  override async interceptResponse(
+    request: Request,
+    response: Response,
+    data: ArrayBuffer,
+  ): Promise<ArrayBuffer> {
+    return data;
+  }
 }
