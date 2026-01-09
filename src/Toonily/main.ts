@@ -1,4 +1,4 @@
-import { SearchQuery, URL } from "@paperback/types";
+import { type SearchQuery, URL } from "@paperback/types";
 import { MadaraGeneric } from "../generic/Madara";
 import pbconfig from "./pbconfig";
 
