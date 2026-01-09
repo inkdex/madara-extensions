@@ -1,4 +1,4 @@
-import { PaperbackInterceptor, Request, Response } from "@paperback/types";
+import { PaperbackInterceptor, type Request, type Response } from "@paperback/types";
 import { MadaraGeneric } from "./Madara";
 
 export class MadaraInterceptor extends PaperbackInterceptor {
