@@ -1,3 +1,6 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+/* Copyright © 2026 Inkdex */
+
 import { MadaraParser } from "../generic/MadaraParser";
 
 export class AzoraMoonParser extends MadaraParser {
