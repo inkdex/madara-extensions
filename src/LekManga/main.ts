@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 /* Copyright © 2026 Inkdex */
 
-import { MadaraGeneric } from "../generic/Madara";
-import { LekMangaParser } from "./parser";
+import { MadaraGeneric } from "../generic/main";
+import { LekMangaParser } from "./parsers";
 import pbconfig from "./pbconfig";
 
 const DOMAIN: string = "https://lekmanga.net";

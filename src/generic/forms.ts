@@ -9,7 +9,7 @@ import {
   Section,
   ToggleRow,
 } from "@paperback/types";
-import { MadaraGeneric } from "./Madara";
+import { MadaraGeneric } from "./main";
 
 // Util
 function toBoolean(value: unknown): boolean | undefined {

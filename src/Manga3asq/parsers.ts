@@ -1,9 +1,9 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 /* Copyright © 2026 Inkdex */
 
-import { MadaraParser } from "../generic/MadaraParser";
+import { MadaraParser } from "../generic/parsers";
 
-export class LekMangaParser extends MadaraParser {
+export class Manga3asqParser extends MadaraParser {
   override parseDate = (date: string): Date => {
     date = date.toUpperCase().trim();
 

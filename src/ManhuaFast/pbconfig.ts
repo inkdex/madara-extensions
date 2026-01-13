@@ -1,27 +1,27 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 /* Copyright © 2026 Inkdex */
 
-import { ContentRating, type SourceInfo, SourceIntents } from "@paperback/types";
-import { getVersion } from "../generic/MadaraHelper";
+import { ContentRating, type ExtensionInfo, SourceIntents } from "@paperback/types";
+import { getVersion } from "../generic/utils";
 
 export default {
   name: "ManhuaFast",
   description: "Extension that pulls content from manhuafast.com.",
   version: getVersion({ increasePrerelease: 1 }),
   icon: "icon.png",
-  language: "🇬🇧",
+  language: "en",
   contentRating: ContentRating.MATURE,
   badges: [],
   capabilities:
-    SourceIntents.MANGA_CHAPTERS |
-    SourceIntents.DISCOVER_SECIONS |
-    SourceIntents.SETTINGS_UI |
-    SourceIntents.MANGA_SEARCH |
-    SourceIntents.CLOUDFLARE_BYPASS_REQUIRED,
+    SourceIntents.CHAPTER_PROVIDING |
+    SourceIntents.DISCOVER_SECIONS_PROVIDING |
+    SourceIntents.SETTINGS_FORM_PROVIDING |
+    SourceIntents.SEARCH_RESULTS_PROVIDING |
+    SourceIntents.CLOUDFLARE_BYPASS_PROVIDING,
   developers: [
     {
       name: "Netsky",
       github: "https://github.com/TheNetsky",
     },
   ],
-} satisfies SourceInfo;
+} satisfies ExtensionInfo;

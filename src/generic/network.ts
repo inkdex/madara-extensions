@@ -2,7 +2,7 @@
 /* Copyright © 2026 Inkdex */
 
 import { PaperbackInterceptor, type Request, type Response } from "@paperback/types";
-import { MadaraGeneric } from "./Madara";
+import { MadaraGeneric } from "./main";
 
 export class MadaraInterceptor extends PaperbackInterceptor {
   source: MadaraGeneric;

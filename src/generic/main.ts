@@ -32,9 +32,9 @@ import {
   URL,
 } from "@paperback/types";
 import * as cheerio from "cheerio";
-import { MadaraInterceptor } from "./MadaraInterceptor";
-import { MadaraParser } from "./MadaraParser";
-import { getUsePostIds, MadaraSettings } from "./MadaraSettings";
+import { MadaraInterceptor } from "./network";
+import { MadaraParser } from "./parsers";
+import { getUsePostIds, MadaraSettings } from "./forms";
 
 export interface GenericParams {
   name: string;
