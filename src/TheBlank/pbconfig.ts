@@ -20,8 +20,9 @@ export default {
     SourceIntents.CLOUDFLARE_BYPASS_PROVIDING,
   developers: [
     {
-      name: "Netsky",
-      github: "https://github.com/TheNetsky",
+      name: "Inkdex",
+      website: "https://inkdex.github.io",
+      github: "https://github.com/inkdex",
     },
   ],
 } satisfies ExtensionInfo;
