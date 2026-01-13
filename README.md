@@ -20,6 +20,7 @@ Paperback extensions for websites which use the generic Madara theme.
 - [MadaraDex](https://madaradex.org)
 - [Manga3asq](https://3asq.org)
 - [MangaClash](https://mangaclash.com)
+- [MangaDistrict](https://mangadistrict.com)
 - [MangaOrigines](https://mangas-origines.fr)
 - [MangaReadOrg](https://mangaread.org)
 - [MangaScantrad](https://manga-scantrad.io)
@@ -39,6 +40,7 @@ Paperback extensions for websites which use the generic Madara theme.
 - [Toonily](https://toonily.com)
 - [UToon](https://utoon.net)
 - [WebtoonXYZ](https://www.webtoon.xyz)
+- [YaoiScan](https://yaoiscan.com)
 
 ## Installation
 
