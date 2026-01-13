@@ -51,6 +51,7 @@ export interface GenericParams {
   directoryPath?: string;
   parser?: MadaraParser;
   requestManager?: PaperbackInterceptor;
+  userAgent?: string;
 }
 
 type Metadata = {
@@ -145,7 +146,7 @@ export abstract class MadaraGeneric
   readonly bypassPage: string;
 
   /**
-   * THe directory path is need to fetch Discovery Sections, however it mostly done automatically, set this when the parser fails!
+   * The directory path is need to fetch Discovery Sections, however it mostly done automatically, set this when the parser fails!
    */
   readonly directoryPath: string;
 
@@ -153,6 +154,11 @@ export abstract class MadaraGeneric
    * Some sources may redirect to the manga page instead of the chapter page if adding the parameter '?style=list'
    */
   readonly useListParameter: boolean;
+
+  /**
+   * Allows providing a custom user agent without replacing the whole interceptor.
+   */
+  readonly userAgent?: string;
 
   parser: MadaraParser;
 
@@ -180,6 +186,7 @@ export abstract class MadaraGeneric
     this.useListParameter = params.useListParameter ?? true;
     this.parser = params.parser ?? new MadaraParser();
     this.requestManager = params.requestManager ?? new MadaraInterceptor("main", this);
+    this.userAgent = params.userAgent;
   }
 
   globalRateLimiter = new BasicRateLimiter("ratelimiter", {
