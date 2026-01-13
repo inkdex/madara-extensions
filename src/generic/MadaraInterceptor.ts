@@ -45,7 +45,7 @@ export class MadaraInterceptor extends PaperbackInterceptor {
 
     request.headers = {
       ...request.headers,
-      "user-agent": await Application.getDefaultUserAgent(),
+      "user-agent": this.source.userAgent ?? (await Application.getDefaultUserAgent()),
       referer: `${this.source.domain}/`,
       origin: `${this.source.domain}/`,
       ...((request.url.includes("wordpress.com") || request.url.includes("wp.com")) && {
