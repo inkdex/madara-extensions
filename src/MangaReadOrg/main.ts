@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 /* Copyright © 2026 Inkdex */
 
-import { MadaraGeneric } from "../generic/Madara";
-import { MangaReadOrgParser } from "./parser";
+import { MadaraGeneric } from "../generic/main";
+import { MangaReadOrgParser } from "./parsers";
 import pbconfig from "./pbconfig";
 
 const DOMAIN: string = "https://www.mangaread.org";

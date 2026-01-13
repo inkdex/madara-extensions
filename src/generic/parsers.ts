@@ -15,9 +15,9 @@ import {
 import type { Cheerio, CheerioAPI } from "cheerio";
 import { Element } from "domhandler"; // Import Element from domhandler
 
-import { MadaraGeneric } from "./Madara";
-import { decryptData, extractVariableValues } from "./MadaraDecrypter";
-import { getUseHQThumbnails, getUsePostIds } from "./MadaraSettings";
+import { MadaraGeneric } from "./main";
+import { decryptData, extractVariableValues } from "./utils";
+import { getUseHQThumbnails, getUsePostIds } from "./forms";
 
 export class MadaraParser {
   async parseMangaDetails(

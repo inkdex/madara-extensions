@@ -2,14 +2,14 @@
 /* Copyright © 2026 Inkdex */
 
 import { ContentRating, SourceIntents, type ExtensionInfo } from "@paperback/types";
-import { getVersion } from "../generic/MadaraHelper";
+import { getVersion } from "../generic/utils";
 
 export default {
   name: "MadaraDex",
   description: "Extension that pulls content from madaradex.org.",
   version: getVersion({ increasePrerelease: 1 }),
   icon: "icon.png",
-  language: "🇬🇧",
+  language: "en",
   contentRating: ContentRating.ADULT,
   badges: [],
   capabilities:
