@@ -1,3 +1,6 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+/* Copyright © 2026 Inkdex */
+
 import { type SearchQuery, URL } from "@paperback/types";
 import { MadaraGeneric } from "../generic/Madara";
 import pbconfig from "./pbconfig";

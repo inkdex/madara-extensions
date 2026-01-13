@@ -1,3 +1,6 @@
+/* SPDX-License-Identifier: GPL-3.0-or-later */
+/* Copyright © 2026 Inkdex */
+
 const BASE_VERSION = "1.0.0-alpha.3";
 
 export function getVersion(
