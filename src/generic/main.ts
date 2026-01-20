@@ -457,14 +457,14 @@ export abstract class MadaraGeneric
   }
 
   async saveCloudflareBypassCookies(cookies: Cookie[]): Promise<void> {
-    // Clear all the cookies
     for (const cookie of cookies) {
-      this.cookieStorageInterceptor.deleteCookie(cookie);
-    }
-
-    // Set all the cookies
-    for (const cookie of cookies) {
-      this.cookieStorageInterceptor.setCookie(cookie);
+      if (
+        cookie.name.startsWith("cf") ||
+        cookie.name.startsWith("_cf") ||
+        cookie.name.startsWith("__cf")
+      ) {
+        this.cookieStorageInterceptor.setCookie(cookie);
+      }
     }
   }
 
@@ -473,7 +473,7 @@ export abstract class MadaraGeneric
     const urlBuilder = new URL(this.domain)
       .addPathComponent(this.searchPagePathName)
       .addPathComponent(page.toString())
-      .setQueryItem("s", encodeURIComponent(this.sanitizeQuery(query?.title ?? "")))
+      .setQueryItem("s", this.sanitizeQuery(query?.title ?? ""))
       .setQueryItem("post_type", "wp-manga");
 
     const genreFilters = Object.keys(query.filters.find((x) => x.id === "genres")?.value ?? {});
