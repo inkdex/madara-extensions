@@ -217,7 +217,6 @@ export class MadaraParser {
 
     const variables = extractVariableValues(
       // @ts-expect-error It's fine
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access
       $(selector).get()[0].children[0].data,
     );
     if (!("chapter_data" in variables) || !("wpmangaprotectornonce" in variables)) {
@@ -226,11 +225,9 @@ export class MadaraParser {
       );
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const chapterList = decryptData(variables["chapter_data"], variables["wpmangaprotectornonce"]);
     const pages: string[] = [];
 
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     chapterList.forEach((page: string) => {
       pages.push(encodeURI(page));
     });
