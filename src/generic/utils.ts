@@ -1,13 +1,9 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 /* Copyright © 2026 Inkdex */
 
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-import * as CryptoJS from "crypto-js";
+import CryptoJS from "crypto-js";
 
-const BASE_VERSION = "1.0.0-alpha.4";
+const BASE_VERSION = "1.0.0-alpha.5";
 
 export function getVersion(
   options?:
