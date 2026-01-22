@@ -211,15 +211,12 @@ export abstract class MadaraGeneric
   }
 
   async getMangaDetails(mangaId: string): Promise<SourceManga> {
-    const [response, buffer] = await Application.scheduleRequest({
+    const [_response, buffer] = await Application.scheduleRequest({
       url: getUsePostIds(this.usePostIds)
         ? `${this.domain}/?p=${mangaId}/`
         : `${this.domain}/temp_dirpath/${mangaId}/`,
       method: "GET",
     });
-    if (response.status !== 200) {
-      throw new Error(`Request failed with status ${response.status}: ${response.url}`);
-    }
 
     const $ = cheerio.load(Application.arrayBufferToUTF8String(buffer));
     return this.parser.parseMangaDetails($, mangaId, this);
@@ -278,10 +275,7 @@ export abstract class MadaraGeneric
         throw new Error("Invalid chapter endpoint!");
     }
 
-    const [response, buffer] = await Application.scheduleRequest(requestConfig);
-    if (response.status !== 200) {
-      throw new Error(`Request failed with status ${response.status}: ${response.url}`);
-    }
+    const [_response, buffer] = await Application.scheduleRequest(requestConfig);
 
     const $ = cheerio.load(Application.arrayBufferToUTF8String(buffer));
 
@@ -301,13 +295,10 @@ export abstract class MadaraGeneric
       url.setQueryItem("style", "list");
     }
 
-    const [response, buffer] = await Application.scheduleRequest({
+    const [_response, buffer] = await Application.scheduleRequest({
       url: url.toString(),
       method: "GET",
     });
-    if (response.status !== 200) {
-      throw new Error(`Request failed with status ${response.status}: ${response.url}`);
-    }
 
     const $ = cheerio.load(Application.arrayBufferToUTF8String(buffer));
 
@@ -373,13 +364,10 @@ export abstract class MadaraGeneric
         throw new Error("Invalid sectionId provided!");
     }
 
-    const [response, buffer] = await Application.scheduleRequest({
+    const [_response, buffer] = await Application.scheduleRequest({
       url: `${this.domain}/temp_dirpath/page/${page}/${param}`,
       method: "GET",
     });
-    if (response.status !== 200) {
-      throw new Error(`Request failed with status ${response.status}: ${response.url}`);
-    }
 
     const $ = cheerio.load(Application.arrayBufferToUTF8String(buffer));
 
@@ -394,13 +382,10 @@ export abstract class MadaraGeneric
   }
 
   async getSearchFilters(): Promise<SearchFilter[]> {
-    const [response, buffer] = await Application.scheduleRequest({
+    const [_response, buffer] = await Application.scheduleRequest({
       url: `${this.domain}/?s=&post_type=wp-manga`,
       method: "GET",
     });
-    if (response.status !== 200) {
-      throw new Error(`Request failed with status ${response.status}: ${response.url}`);
-    }
 
     const $ = cheerio.load(Application.arrayBufferToUTF8String(buffer));
 
@@ -430,11 +415,7 @@ export abstract class MadaraGeneric
   ): Promise<PagedResults<SearchResultItem>> {
     const page = metadata?.page ?? 1;
 
-    const [response, buffer] = await this.constructSearchRequest(page, query);
-
-    if (response.status !== 200) {
-      throw new Error(`Request failed with status ${response.status}: ${response.url}`);
-    }
+    const [_response, buffer] = await this.constructSearchRequest(page, query);
 
     const $ = cheerio.load(Application.arrayBufferToUTF8String(buffer));
 
@@ -651,14 +632,10 @@ export abstract class MadaraGeneric
       return getPath;
     }
 
-    const [response, buffer] = await Application.scheduleRequest({
+    const [_response, buffer] = await Application.scheduleRequest({
       url: `${this.domain}/?s=&post_type=wp-manga#directoryRequest`,
       method: "GET",
     });
-
-    if (response.status !== 200) {
-      throw new Error(`Request failed with status ${response.status}: ${response.url}`);
-    }
 
     const $ = cheerio.load(Application.arrayBufferToUTF8String(buffer));
 

@@ -91,6 +91,10 @@ export class MadaraInterceptor extends PaperbackInterceptor {
       );
     }
 
+    if (response.status !== 200) {
+      throw new Error(`Request failed with status ${response.status}: ${request.url}`);
+    }
+
     return data;
   }
 }
