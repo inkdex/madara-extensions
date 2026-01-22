@@ -87,7 +87,7 @@ export class MadaraInterceptor extends PaperbackInterceptor {
             "user-agent": await Application.getDefaultUserAgent(),
           },
         },
-        "Cloudflare detected!\nPlease do the Cloudflare bypass to continue!",
+        "Cloudflare detected, bypass it to continue!",
       );
     }
 
