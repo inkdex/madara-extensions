@@ -7,7 +7,6 @@ import {
   type ChapterDetails,
   type ChapterProviding,
   type CloudflareBypassRequestProviding,
-  CloudflareError,
   ContentRating,
   type Cookie,
   CookieStorageInterceptor,
@@ -21,7 +20,6 @@ import {
   type PagedResults,
   PaperbackInterceptor,
   type Request,
-  type Response,
   type SearchFilter,
   type SearchQuery,
   type SearchResultItem,
@@ -219,7 +217,9 @@ export abstract class MadaraGeneric
         : `${this.domain}/temp_dirpath/${mangaId}/`,
       method: "GET",
     });
-    await this.checkResponseError(response);
+    if (response.status !== 200) {
+      throw new Error(`Request failed with status ${response.status}: ${response.url}`);
+    }
 
     const $ = cheerio.load(Application.arrayBufferToUTF8String(buffer));
     return this.parser.parseMangaDetails($, mangaId, this);
@@ -279,7 +279,9 @@ export abstract class MadaraGeneric
     }
 
     const [response, buffer] = await Application.scheduleRequest(requestConfig);
-    await this.checkResponseError(response);
+    if (response.status !== 200) {
+      throw new Error(`Request failed with status ${response.status}: ${response.url}`);
+    }
 
     const $ = cheerio.load(Application.arrayBufferToUTF8String(buffer));
 
@@ -303,7 +305,9 @@ export abstract class MadaraGeneric
       url: url.toString(),
       method: "GET",
     });
-    await this.checkResponseError(response);
+    if (response.status !== 200) {
+      throw new Error(`Request failed with status ${response.status}: ${response.url}`);
+    }
 
     const $ = cheerio.load(Application.arrayBufferToUTF8String(buffer));
 
@@ -373,7 +377,9 @@ export abstract class MadaraGeneric
       url: `${this.domain}/temp_dirpath/page/${page}/${param}`,
       method: "GET",
     });
-    await this.checkResponseError(response);
+    if (response.status !== 200) {
+      throw new Error(`Request failed with status ${response.status}: ${response.url}`);
+    }
 
     const $ = cheerio.load(Application.arrayBufferToUTF8String(buffer));
 
@@ -392,7 +398,9 @@ export abstract class MadaraGeneric
       url: `${this.domain}/?s=&post_type=wp-manga`,
       method: "GET",
     });
-    await this.checkResponseError(response);
+    if (response.status !== 200) {
+      throw new Error(`Request failed with status ${response.status}: ${response.url}`);
+    }
 
     const $ = cheerio.load(Application.arrayBufferToUTF8String(buffer));
 
@@ -424,7 +432,9 @@ export abstract class MadaraGeneric
 
     const [response, buffer] = await this.constructSearchRequest(page, query);
 
-    await this.checkResponseError(response);
+    if (response.status !== 200) {
+      throw new Error(`Request failed with status ${response.status}: ${response.url}`);
+    }
 
     const $ = cheerio.load(Application.arrayBufferToUTF8String(buffer));
 
@@ -646,7 +656,9 @@ export abstract class MadaraGeneric
       method: "GET",
     });
 
-    await this.checkResponseError(response);
+    if (response.status !== 200) {
+      throw new Error(`Request failed with status ${response.status}: ${response.url}`);
+    }
 
     const $ = cheerio.load(Application.arrayBufferToUTF8String(buffer));
 
@@ -655,27 +667,5 @@ export abstract class MadaraGeneric
     // Store parsed path else store the default (manga)
     Application.setState(path, `dirpath_${this.domain}`);
     return path;
-  }
-
-  async checkResponseError(response: Response): Promise<void> {
-    const status = response.status;
-    switch (status) {
-      case 403:
-      case 503:
-        throw new CloudflareError(
-          {
-            url: this.bypassPage ? this.bypassPage : this.domain,
-            method: "GET",
-            headers: {
-              referer: `${this.domain}/`,
-              origin: `${this.domain}/`,
-              "user-agent": await Application.getDefaultUserAgent(),
-            },
-          },
-          "Cloudflare detected!\nPlease do the Cloudflare bypass to continue!",
-        );
-      case 404:
-        throw new Error(`The requested page ${response.url} was not found!`);
-    }
   }
 }
