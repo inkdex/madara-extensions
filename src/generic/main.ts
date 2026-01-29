@@ -44,6 +44,7 @@ export interface GenericParams {
   searchMangaSelector?: string;
   searchRatingSelector?: string;
   hasProtectedChapters?: boolean;
+  mangaPathName?: string;
   protectedChapterDataSelector?: string;
   chapterEndpoint?: number;
   chapterDetailsSelector?: string;
@@ -100,6 +101,11 @@ export abstract class MadaraGeneric
    * Eg. for https://mangabob.com/page/2/?s&post_type=wp-manga it would be 'page'
    */
   readonly searchPagePathName: string;
+
+  /**
+   * The path used for accessing manga details. Eg. for https://hiperdex.tv/manga/manga-slug/ it would be 'manga'
+   */
+  readonly mangaPathName: string;
 
   /**
    * Different Madara sources might have a slightly different selector which is required to parse out
@@ -178,6 +184,7 @@ export abstract class MadaraGeneric
     this.searchMangaSelector = params.searchMangaSelector ?? "div.c-tabs-item__content";
     this.searchRatingSelector = params.searchRatingSelector ?? "span.score";
     this.hasProtectedChapters = params.hasProtectedChapters ?? false;
+    this.mangaPathName = params.mangaPathName ?? "temp_dirpath";
     this.protectedChapterDataSelector =
       params.protectedChapterDataSelector ?? "#chapter-protector-data";
     this.chapterEndpoint = params.chapterEndpoint ?? 3;
@@ -214,7 +221,7 @@ export abstract class MadaraGeneric
     const [_response, buffer] = await Application.scheduleRequest({
       url: getUsePostIds(this.usePostIds)
         ? `${this.domain}/?p=${mangaId}/`
-        : `${this.domain}/temp_dirpath/${mangaId}/`,
+        : `${this.domain}/${this.mangaPathName}/${mangaId}/`,
       method: "GET",
     });
 
@@ -243,7 +250,7 @@ export abstract class MadaraGeneric
 
       case 1:
         requestConfig = {
-          url: `${this.domain}/temp_dirpath/${mangaId.slug}/ajax/chapters`,
+          url: `${this.domain}/${this.mangaPathName}/${mangaId.slug}/ajax/chapters`,
           method: "POST",
           headers: {
             "content-type": "application/x-www-form-urlencoded",
@@ -253,7 +260,7 @@ export abstract class MadaraGeneric
 
       case 2:
         requestConfig = {
-          url: `${this.domain}/temp_dirpath/${mangaId.slug}`,
+          url: `${this.domain}/${this.mangaPathName}/${mangaId.slug}`,
           method: "POST",
           headers: {
             "content-type": "application/x-www-form-urlencoded",
@@ -263,7 +270,7 @@ export abstract class MadaraGeneric
 
       case 3:
         requestConfig = {
-          url: `${this.domain}/temp_dirpath/${mangaId.slug}`,
+          url: `${this.domain}/${this.mangaPathName}/${mangaId.slug}`,
           method: "GET",
           headers: {
             "content-type": "application/x-www-form-urlencoded",
@@ -286,7 +293,7 @@ export abstract class MadaraGeneric
     const mangaId = await this.getPostAndSlug(chapter.sourceManga.mangaId);
     const chapterId = chapter.chapterId;
 
-    const url = new URL(this.domain).addPathComponent("temp_dirpath");
+    const url = new URL(this.domain).addPathComponent(this.mangaPathName);
     url.addPathComponent(mangaId.slug);
 
     url.addPathComponent(chapterId);
@@ -365,7 +372,7 @@ export abstract class MadaraGeneric
     }
 
     const [_response, buffer] = await Application.scheduleRequest({
-      url: `${this.domain}/temp_dirpath/page/${page}/${param}`,
+      url: `${this.domain}/${this.mangaPathName}/page/${page}/${param}`,
       method: "GET",
     });
 
@@ -568,7 +575,7 @@ export abstract class MadaraGeneric
   async convertSlugToPostId(slug: string): Promise<number> {
     // Credit to the MadaraDex team :-D
     const [headResponse] = await Application.scheduleRequest({
-      url: `${this.domain}/temp_dirpath/${slug}`,
+      url: `${this.domain}/${this.mangaPathName}/${slug}`,
       method: "HEAD",
     });
 
@@ -580,7 +587,7 @@ export abstract class MadaraGeneric
 
     // Move on to the alternative method of parsing
     const [, buffer] = await Application.scheduleRequest({
-      url: `${this.domain}/temp_dirpath/${slug}`,
+      url: `${this.domain}/${this.mangaPathName}/${slug}`,
       method: "GET",
     });
 

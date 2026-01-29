@@ -17,6 +17,7 @@ class ToonilyExtension extends MadaraGeneric {
       usePostIds: true,
       searchMangaSelector: "div.page-item-detail.manga",
       searchRatingSelector: "span#averagerate",
+      mangaPathName: "serie",
     });
   }
 

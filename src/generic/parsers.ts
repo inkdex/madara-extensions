@@ -315,7 +315,6 @@ export class MadaraParser {
 
   async parseSearchResults($: CheerioAPI, source: MadaraGeneric) {
     const results = [];
-
     for (const obj of $(source.searchMangaSelector).toArray()) {
       const slug: string =
         ($("a", obj).attr("href") ?? "").replace(/\/$/, "").split("/").pop() ?? "";
