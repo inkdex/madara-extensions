@@ -480,12 +480,9 @@ export abstract class MadaraGeneric
     });
   }
 
+  // convert smart quotes (iOS uses them by default)
   sanitizeQuery(query: string): string {
-    return query
-      .replace(/'[^ ]*/g, "") // Remove apostrophes and the following characters up to a space
-      .replace(/\.+/g, "") // Remove all periods
-      .replace(/["']/g, "") // Remove quotes
-      .trim();
+    return query.replace(/[‘’]/g, "'").replace(/[“”]/g, '"');
   }
 
   async getPostAndSlug(mangaId: string) {
