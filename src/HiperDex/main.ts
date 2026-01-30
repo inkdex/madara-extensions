@@ -4,7 +4,7 @@
 import { MadaraGeneric } from "../generic/main";
 import pbconfig from "./pbconfig";
 
-const DOMAIN: string = "https://hiperdex.tv";
+const DOMAIN: string = "https://hiperdex.com";
 
 class HiperDexExtension extends MadaraGeneric {
   constructor() {
@@ -14,6 +14,7 @@ class HiperDexExtension extends MadaraGeneric {
       contentRating: pbconfig.contentRating,
       language: pbconfig.language,
       usePostIds: true,
+      searchMangaSelector: "div.page-item-detail",
     });
   }
 }
