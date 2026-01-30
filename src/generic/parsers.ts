@@ -173,7 +173,7 @@ export class MadaraParser {
         title: chapName ? Application.decodeHTMLEntities(chapName) : "",
         publishDate: mangaTime,
         sortingIndex: sortingIndex,
-        volume: 0
+        volume: 0,
       });
     }
 
@@ -360,7 +360,7 @@ export class MadaraParser {
     if (pathSegment) {
       return pathSegment;
     }
-    
+
     return "manga";
   }
 
