@@ -173,6 +173,7 @@ export class MadaraParser {
         title: chapName ? Application.decodeHTMLEntities(chapName) : "",
         publishDate: mangaTime,
         sortingIndex: sortingIndex,
+        volume: 0
       });
     }
 
