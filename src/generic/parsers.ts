@@ -344,14 +344,6 @@ export class MadaraParser {
   }
 
   parseDirectoryPath($: CheerioAPI, source: MadaraGeneric): string {
-    // Parse path from meta property
-    const url = $('meta[property="og:url"]').attr("content") ?? "";
-    const fullPath = url.replace(source.domain, "");
-    const pathSegment = (fullPath.split("/")[1] ?? "").trim();
-    if (pathSegment) {
-      return pathSegment;
-    }
-
     // Parse path from first search result
     const searchResult = $(source.searchMangaSelector).first();
     const searchResultPath: string =
@@ -361,6 +353,14 @@ export class MadaraParser {
       return searchResultPath;
     }
 
+    // Fallback: Parse path from meta property
+    const url = $('meta[property="og:url"]').attr("content") ?? "";
+    const fullPath = url.replace(source.domain, "");
+    const pathSegment = (fullPath.split("/")[1] ?? "").trim();
+    if (pathSegment) {
+      return pathSegment;
+    }
+    
     return "manga";
   }
 
