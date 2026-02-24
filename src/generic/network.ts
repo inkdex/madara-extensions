@@ -92,6 +92,9 @@ export class MadaraInterceptor extends PaperbackInterceptor {
     }
 
     if (response.status !== 200) {
+      if (response.status === 404 && request.url.includes(this.source.searchPagePathName)) {
+        return data;
+      }
       throw new Error(`Request failed with status ${response.status}: ${request.url}`);
     }
 

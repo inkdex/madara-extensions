@@ -3,7 +3,7 @@
 
 import CryptoJS from "crypto-js";
 
-const BASE_VERSION = "1.0.0-alpha.7";
+const BASE_VERSION = "1.0.0-alpha.8";
 
 export function getVersion(
   options?:
