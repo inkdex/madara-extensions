@@ -417,6 +417,10 @@ export abstract class MadaraGeneric
 
     const [_response, buffer] = await this.constructSearchRequest(page, query);
 
+    if (_response.status === 404) {
+      return { items: [], metadata: undefined }; // Madara doesn't support last page checking, will return 404 on website!
+    }
+
     const $ = cheerio.load(Application.arrayBufferToUTF8String(buffer));
 
     const results = await this.parser.parseSearchResults($, this);
@@ -443,7 +447,7 @@ export abstract class MadaraGeneric
 
     return {
       items: items,
-      metadata: { page: page + 1 }, // Madara doesn't support last page checking, will return 404 on website!
+      metadata: items.length > 0 ? { page: page + 1 } : undefined,
     };
   }
 
