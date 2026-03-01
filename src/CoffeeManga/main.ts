@@ -4,7 +4,7 @@
 import { MadaraGeneric } from "../generic/main";
 import pbconfig from "./pbconfig";
 
-const DOMAIN: string = "https://coffeemanga.io";
+const DOMAIN: string = "https://coffeemanga.ink";
 
 class CoffeeMangaExtension extends MadaraGeneric {
   constructor() {

@@ -6,8 +6,8 @@ import { getVersion } from "../generic/utils";
 
 export default {
   name: "CoffeeManga",
-  description: "Extension that pulls content from coffeemanga.io.",
-  version: getVersion({ increasePrerelease: 1 }),
+  description: "Extension that pulls content from coffeemanga.ink.",
+  version: getVersion({ increasePrerelease: 2 }),
   icon: "icon.png",
   language: "en",
   contentRating: ContentRating.MATURE,
