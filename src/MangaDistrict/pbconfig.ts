@@ -4,7 +4,7 @@ import { getVersion } from "../generic/utils";
 export default {
   name: "MangaDistrict",
   description: "Extension that pulls content from mangadistrict.com.",
-  version: getVersion({ increasePrerelease: -3 }),
+  version: getVersion({ increasePrerelease: -2 }),
   icon: "icon.png",
   language: "en",
   contentRating: ContentRating.ADULT,

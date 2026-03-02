@@ -12,6 +12,7 @@ class MangaDistrictExtension extends MadaraGeneric {
       language: pbconfig.language,
       usePostIds: true,
       directoryPath: "title",
+      searchMangaSelector: ".page-listing-item",
     });
   }
 }
