@@ -1,28 +1,15 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 /* Copyright © 2026 Inkdex */
 
-import { ContentRating, type ExtensionInfo, SourceIntents } from "@paperback/types";
-import { getVersion } from "../generic/utils";
+import { ContentRating } from "@paperback/types";
+import { basePbConfig, customVersion } from "../generic/config";
 
-export default {
-  name: "MangaScantrad",
-  description: "Extension that pulls content from manga-scantrad.io.",
-  version: getVersion({ increasePrerelease: 1 }),
-  icon: "icon.png",
-  language: "fr",
-  contentRating: ContentRating.MATURE,
-  badges: [],
-  capabilities:
-    SourceIntents.CHAPTER_PROVIDING |
-    SourceIntents.DISCOVER_SECIONS_PROVIDING |
-    SourceIntents.SETTINGS_FORM_PROVIDING |
-    SourceIntents.SEARCH_RESULTS_PROVIDING |
-    SourceIntents.CLOUDFLARE_BYPASS_PROVIDING,
-  developers: [
-    {
-      name: "Inkdex",
-      website: "https://inkdex.github.io",
-      github: "https://github.com/inkdex",
-    },
-  ],
-} satisfies ExtensionInfo;
+let pbConfig = basePbConfig;
+
+pbConfig.name = "MangaScantrad";
+pbConfig.description = "Extension that pulls content from manga-scantrad.io.";
+pbConfig.version = customVersion({ increasePrerelease: 1 });
+pbConfig.language = "fr";
+pbConfig.contentRating = ContentRating.MATURE;
+
+export default pbConfig;
