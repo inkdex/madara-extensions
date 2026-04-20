@@ -1,5 +1,5 @@
 {
-  "name": "madara-extensions",
+  "name": "Madara Extensions (0.9)",
   "private": true,
   "description": "Paperback extensions for websites which use the generic Madara theme. Maintained by Inkdex.",
   "type": "module",
@@ -27,6 +27,5 @@
     "oxlint": "^1.60.0",
     "oxlint-tsgolint": "^0.21.1",
     "typescript": "^6.0.3"
-  },
-  "repositoryName": "Madara Extensions (0.9)"
+  }
 }
