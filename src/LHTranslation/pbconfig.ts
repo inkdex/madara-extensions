@@ -1,28 +1,12 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 /* Copyright © 2026 Inkdex */
 
-import { ContentRating, type ExtensionInfo, SourceIntents } from "@paperback/types";
-import { getVersion } from "../generic/utils";
+import { basePbConfig, customVersion } from "../generic/config";
 
-export default {
-  name: "LHTranslation",
-  description: "Extension that pulls content from lhtranslation.net.",
-  version: getVersion({ increasePrerelease: 1 }),
-  icon: "icon.png",
-  language: "en",
-  contentRating: ContentRating.EVERYONE,
-  badges: [],
-  capabilities:
-    SourceIntents.CHAPTER_PROVIDING |
-    SourceIntents.DISCOVER_SECIONS_PROVIDING |
-    SourceIntents.SETTINGS_FORM_PROVIDING |
-    SourceIntents.SEARCH_RESULTS_PROVIDING |
-    SourceIntents.CLOUDFLARE_BYPASS_PROVIDING,
-  developers: [
-    {
-      name: "Inkdex",
-      website: "https://inkdex.github.io",
-      github: "https://github.com/inkdex",
-    },
-  ],
-} satisfies ExtensionInfo;
+let pbConfig = basePbConfig;
+
+pbConfig.name = "LHTranslation";
+pbConfig.description = "Extension that pulls content from lhtranslation.net.";
+pbConfig.version = customVersion({ increasePrerelease: 1 });
+
+export default pbConfig;

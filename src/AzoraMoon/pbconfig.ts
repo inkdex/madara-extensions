@@ -1,28 +1,12 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 /* Copyright © 2026 Inkdex */
 
-import { ContentRating, type ExtensionInfo, SourceIntents } from "@paperback/types";
-import { getVersion } from "../generic/utils";
+import { basePbConfig } from "../generic/config";
 
-export default {
-  name: "AzoraMoon",
-  description: "Extension that pulls content from azoramoon.com.",
-  version: getVersion(),
-  icon: "icon.png",
-  language: "ar",
-  contentRating: ContentRating.EVERYONE,
-  badges: [],
-  capabilities:
-    SourceIntents.CHAPTER_PROVIDING |
-    SourceIntents.DISCOVER_SECIONS_PROVIDING |
-    SourceIntents.SETTINGS_FORM_PROVIDING |
-    SourceIntents.SEARCH_RESULTS_PROVIDING |
-    SourceIntents.CLOUDFLARE_BYPASS_PROVIDING,
-  developers: [
-    {
-      name: "Inkdex",
-      website: "https://inkdex.github.io",
-      github: "https://github.com/inkdex",
-    },
-  ],
-} satisfies ExtensionInfo;
+let pbConfig = basePbConfig;
+
+pbConfig.name = "AzoraMoon";
+pbConfig.description = "Extension that pulls content from azoramoon.com.";
+pbConfig.language = "ar";
+
+export default pbConfig;
