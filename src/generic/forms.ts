@@ -1,14 +1,7 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 /* Copyright © 2026 Inkdex */
 
-import {
-  ButtonRow,
-  Form,
-  type FormSectionElement,
-  LabelRow,
-  Section,
-  ToggleRow,
-} from "@paperback/types";
+import { ButtonRow, Form, LabelRow, Section, ToggleRow } from "@paperback/types";
 import { MadaraGeneric } from "./main";
 
 // Util
@@ -53,7 +46,7 @@ export class MadaraSettings extends Form {
     this.source = source;
   }
 
-  override getSections(): FormSectionElement[] {
+  override getSections() {
     return [
       Section(`${this.source.name} Settings`.replaceAll(" ", ""), [
         ToggleRow("postIds", {

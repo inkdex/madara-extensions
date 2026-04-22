@@ -17,8 +17,8 @@
     "prepare": "husky"
   },
   "devDependencies": {
-    "@paperback/toolchain": "^1.0.0-alpha.64",
-    "@paperback/types": "^1.0.0-alpha.64",
+    "@paperback/toolchain": "^1.0.0-alpha.74",
+    "@paperback/types": "^1.0.0-alpha.74",
     "@types/crypto-js": "^4.2.2",
     "cheerio": "^1.2.0",
     "crypto-js": "^4.2.0",
