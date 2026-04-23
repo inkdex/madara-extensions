@@ -226,7 +226,10 @@ export class MadaraParser {
       );
     }
 
-    const chapterList = decryptData(variables["chapter_data"], variables["wpmangaprotectornonce"]);
+    const chapterList = await decryptData(
+      variables["chapter_data"],
+      variables["wpmangaprotectornonce"],
+    );
     const pages: string[] = [];
 
     chapterList.forEach((page: string) => {
