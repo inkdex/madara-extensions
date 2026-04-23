@@ -1,51 +1,53 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 /* Copyright © 2026 Inkdex */
 
-import CryptoJS from "crypto-js";
+function hexToBytes(hex: string): Uint8Array<ArrayBuffer> {
+  const out = new Uint8Array(new ArrayBuffer(hex.length / 2));
+  for (let i = 0; i < out.length; i++) {
+    out[i] = parseInt(hex.slice(i * 2, i * 2 + 2), 16);
+  }
+  return out;
+}
 
-type CipherParams = CryptoJS.lib.CipherParams;
+function md5Bytes(data: Uint8Array): Uint8Array {
+  return hexToBytes(Application.crypto_md5Hash(data.buffer as ArrayBuffer));
+}
 
-const CryptoJSFormatter = {
-  stringify: function (cipherParams: CipherParams) {
-    const jsonObj = {
-      ct: cipherParams.ciphertext.toString(CryptoJS.enc.Base64),
-      iv: "",
-      s: "",
-    };
-    if (cipherParams.iv) {
-      jsonObj.iv = cipherParams.iv.toString();
-    }
+function deriveKeyAndIv(passphrase: string, salt: Uint8Array) {
+  const pass = new TextEncoder().encode(passphrase);
+  const out = new Uint8Array(48);
+  let block: Uint8Array = new Uint8Array(0);
+  let filled = 0;
+  while (filled < 48) {
+    const input = new Uint8Array(block.length + pass.length + salt.length);
+    input.set(block, 0);
+    input.set(pass, block.length);
+    input.set(salt, block.length + pass.length);
+    block = md5Bytes(input);
+    out.set(block, filled);
+    filled += block.length;
+  }
+  return { key: out.slice(0, 32), iv: out.slice(32, 48) };
+}
 
-    if (cipherParams.salt) {
-      jsonObj.s = cipherParams.salt.toString();
-    }
-    return JSON.stringify(jsonObj);
-  },
-  parse: function (jsonStr: string) {
-    const jsonObj = JSON.parse(jsonStr);
-    const cipherParams = CryptoJS.lib.CipherParams.create({
-      ciphertext: CryptoJS.enc.Base64.parse(jsonObj.ct),
-    });
-    if (jsonObj.iv) {
-      cipherParams.iv = CryptoJS.enc.Hex.parse(jsonObj.iv);
-    }
-
-    if (jsonObj.s) {
-      cipherParams.salt = CryptoJS.enc.Hex.parse(jsonObj.s);
-    }
-
-    return cipherParams;
-  },
-};
-
-export function decryptData(cipherText: string, key: string) {
-  return JSON.parse(
-    JSON.parse(
-      CryptoJS.AES.decrypt(cipherText, key, {
-        format: CryptoJSFormatter,
-      }).toString(CryptoJS.enc.Utf8),
-    ),
-  );
+export async function decryptData(cipherText: string, passphrase: string) {
+  const {
+    ct,
+    iv: ivHex,
+    s: saltHex,
+  } = JSON.parse(cipherText) as {
+    ct: string;
+    iv: string;
+    s: string;
+  };
+  const { key, iv: derivedIv } = deriveKeyAndIv(passphrase, hexToBytes(saltHex));
+  const iv = ivHex ? hexToBytes(ivHex) : derivedIv;
+  const cipherBuffer = Application.base64Decode(ct) as ArrayBuffer;
+  const cryptoKey = await crypto.subtle.importKey("raw", key, { name: "AES-CBC" }, false, [
+    "decrypt",
+  ]);
+  const plaintext = await crypto.subtle.decrypt({ name: "AES-CBC", iv }, cryptoKey, cipherBuffer);
+  return JSON.parse(JSON.parse(new TextDecoder().decode(plaintext)));
 }
 
 export function extractVariableValues(chapterData: string): Record<string, string> {
