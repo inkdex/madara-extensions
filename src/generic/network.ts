@@ -7,6 +7,7 @@ import {
   type Request,
   type Response,
 } from "@paperback/types";
+
 import { MadaraGeneric } from "./main";
 
 export class MadaraInterceptor extends PaperbackInterceptor {
