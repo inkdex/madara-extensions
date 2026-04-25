@@ -2,6 +2,7 @@
 /* Copyright © 2026 Inkdex */
 
 import { type SearchQuery, URL } from "@paperback/types";
+
 import { MadaraGeneric } from "../generic/main";
 import pbconfig from "./pbconfig";
 

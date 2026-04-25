@@ -2,6 +2,7 @@
 /* Copyright © 2026 Inkdex */
 
 import { ButtonRow, Form, LabelRow, Section, ToggleRow } from "@paperback/types";
+
 import { MadaraGeneric } from "./main";
 
 // Util

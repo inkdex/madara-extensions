@@ -30,9 +30,10 @@ import {
   URL,
 } from "@paperback/types";
 import * as cheerio from "cheerio";
+
+import { getUsePostIds, MadaraSettings } from "./forms";
 import { MadaraInterceptor } from "./network";
 import { MadaraParser } from "./parsers";
-import { getUsePostIds, MadaraSettings } from "./forms";
 
 export interface GenericParams {
   name: string;
