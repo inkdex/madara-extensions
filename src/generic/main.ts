@@ -20,7 +20,6 @@ import {
   type PagedResults,
   PaperbackInterceptor,
   type Request,
-  type SearchFilter,
   type SearchQuery,
   type SearchResultItem,
   type SearchResultsProviding,
@@ -29,6 +28,11 @@ import {
   type TagSection,
   URL,
 } from "@paperback/types";
+import {
+  SearchFilterForm,
+  type SearchFilter,
+  type SearchFilterValue,
+} from "@paperback/types/lib/compat/0.8";
 import * as cheerio from "cheerio";
 
 import { getUsePostIds, MadaraSettings } from "./forms";
@@ -410,8 +414,13 @@ export abstract class MadaraGeneric
     ];
   }
 
+  async getAdvancedSearchForm(query: SearchQuery<SearchFilterValue[]>) {
+    // TODO: Replace compat wrapper with proper search form implementation
+    return new SearchFilterForm(query.metadata, this.getSearchFilters());
+  }
+
   async getSearchResults(
-    query: SearchQuery,
+    query: SearchQuery<SearchFilterValue[]>,
     metadata: Metadata | undefined,
   ): Promise<PagedResults<SearchResultItem>> {
     const page = metadata?.page ?? 1;
@@ -465,14 +474,16 @@ export abstract class MadaraGeneric
   }
 
   // Utility
-  constructSearchRequest(page: number, query: SearchQuery) {
+  constructSearchRequest(page: number, query: SearchQuery<SearchFilterValue[]>) {
     const urlBuilder = new URL(this.domain)
       .addPathComponent(this.searchPagePathName)
       .addPathComponent(page.toString())
       .setQueryItem("s", this.sanitizeQuery(query?.title ?? ""))
       .setQueryItem("post_type", "wp-manga");
 
-    const genreFilters = Object.keys(query.filters.find((x) => x.id === "genres")?.value ?? {});
+    const genreFilters = Object.keys(
+      (query.metadata ?? []).find((x) => x.id === "genres")?.value ?? {},
+    );
 
     if (genreFilters.length) {
       genreFilters.forEach((genre, i) => urlBuilder.setQueryItem(`genre[${i}]`, genre));
