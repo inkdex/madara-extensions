@@ -1,0 +1,1 @@
+{"name":"YaoiScan","description":"Extension that pulls content from yaoiscan.com.","version":"1.0.0-alpha.9","icon":"icon.png","language":"en","contentRating":"ADULT","capabilities":[1,16,4,32,64],"badges":[],"developers":[{"name":"Inkdex","website":"https://inkdex.github.io","github":"https://github.com/inkdex"}],"id":"YaoiScan"}
