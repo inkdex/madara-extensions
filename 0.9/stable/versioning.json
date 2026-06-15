@@ -1,5 +1,5 @@
 {
-  "buildTime": "2026-05-31T13:37:14.612Z",
+  "buildTime": "2026-06-15T09:53:05.775Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.87",
     "types": "1.0.0-alpha.87"
@@ -176,30 +176,6 @@
         }
       ],
       "id": "GourmetScans"
-    },
-    {
-      "name": "HariManga",
-      "description": "Extension that pulls content from https://harimanga.me.",
-      "version": "1.0.0-alpha.11",
-      "icon": "icon.png",
-      "language": "en",
-      "contentRating": "MATURE",
-      "capabilities": [
-        1,
-        16,
-        4,
-        32,
-        64
-      ],
-      "badges": [],
-      "developers": [
-        {
-          "name": "Inkdex",
-          "website": "https://inkdex.github.io",
-          "github": "https://github.com/inkdex"
-        }
-      ],
-      "id": "HariManga"
     },
     {
       "name": "HiperDex",
