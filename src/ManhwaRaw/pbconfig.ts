@@ -3,7 +3,7 @@
 
 import { ContentRating } from "@paperback/types";
 
-import { basePbConfig } from "../generic/config";
+import { basePbConfig, customVersion } from "../generic/config";
 
 let pbConfig = basePbConfig;
 
@@ -11,5 +11,6 @@ pbConfig.name = "ManhwaRaw";
 pbConfig.description = "Extension that pulls content from manhwa-raw.com.";
 pbConfig.language = "ko";
 pbConfig.contentRating = ContentRating.ADULT;
+pbConfig.version = customVersion({ increasePrerelease: 1 });
 
 export default pbConfig;
