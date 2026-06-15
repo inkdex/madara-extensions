@@ -11,7 +11,6 @@ Paperback extensions for websites which use the generic Madara theme.
 - [DarkScans](https://darkscans.com)
 - [DragonTea](https://dragontea.ink)
 - [GourmetScans](https://gourmetsupremacy.com)
-- [HariManga](https://harimanga.com)
 - [HiperDex](https://hiperdex.com)
 - [KunManga](https://kunmanga.com)
 - [LekManga](https://lekmanga.com)
