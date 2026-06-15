@@ -14,6 +14,7 @@ class ManhwaRawExtension extends MadaraGeneric {
       contentRating: pbconfig.contentRating,
       language: pbconfig.language,
       usePostIds: true,
+      directoryPath: "manga",
     });
   }
 }
