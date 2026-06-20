@@ -239,10 +239,7 @@ export abstract class MadaraGeneric
           headers: {
             "content-type": "application/x-www-form-urlencoded",
           },
-          body: {
-            action: "manga_get_chapters",
-            manga: mangaId.postId,
-          },
+          body: `action=manga_get_chapters&manga=${encodeURIComponent(mangaId.postId)}`,
         };
         break;
 
