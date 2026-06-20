@@ -27,6 +27,7 @@ Paperback extensions for websites which use the generic Madara theme.
 - [ManhuaFast](https://manhuafast.com)
 - [ManhuaPlus](https://manhuaplus.com)
 - [Manhuas](https://manhuaus.com)
+- [ManhwaClub](https://manhwaclub.net)
 - [ManhwaRaw](https://manhwaraw.com)
 - [ManhwaTop](https://manhwatop.com)
 - [NovelMic](https://novelmic.com)
