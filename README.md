@@ -30,7 +30,6 @@ Paperback extensions for websites which use the generic Madara theme.
 - [ManhwaClub](https://manhwaclub.net)
 - [ManhwaRaw](https://manhwaraw.com)
 - [ManhwaTop](https://manhwatop.com)
-- [NovelMic](https://novelmic.com)
 - [PlatinumScans](https://platinumscans.com)
 - [ResetScans](https://reset-scans.org)
 - [SamuraiScan](https://samurai.wordoco.com)
