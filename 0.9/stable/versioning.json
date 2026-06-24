@@ -1,5 +1,5 @@
 {
-  "buildTime": "2026-06-23T11:26:54.994Z",
+  "buildTime": "2026-06-24T17:03:02.345Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.92",
     "types": "1.0.0-alpha.92"
@@ -632,30 +632,6 @@
         }
       ],
       "id": "ManhwaTop"
-    },
-    {
-      "name": "NovelMic",
-      "description": "Extension that pulls content from novelmic.com.",
-      "version": "1.0.0-alpha.13",
-      "icon": "icon.png",
-      "language": "en",
-      "contentRating": "MATURE",
-      "capabilities": [
-        1,
-        16,
-        4,
-        32,
-        64
-      ],
-      "badges": [],
-      "developers": [
-        {
-          "name": "Inkdex",
-          "website": "https://inkdex.github.io",
-          "github": "https://github.com/inkdex"
-        }
-      ],
-      "id": "NovelMic"
     },
     {
       "name": "PlatinumScans",
