@@ -3,12 +3,13 @@
 
 import { ContentRating } from "@paperback/types";
 
-import { basePbConfig } from "../generic/config";
+import { basePbConfig, customVersion } from "../generic/config";
 
 let pbConfig = basePbConfig;
 
 pbConfig.name = "UToon";
 pbConfig.description = "Extension that pulls content from utoon.net.";
 pbConfig.contentRating = ContentRating.ADULT;
+pbConfig.version = customVersion({ increasePrerelease: 1 });
 
 export default pbConfig;
