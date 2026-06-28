@@ -31,7 +31,6 @@ Paperback extensions for websites which use the generic Madara theme.
 - [ManhwaRaw](https://manhwaraw.com)
 - [ManhwaTop](https://manhwatop.com)
 - [PlatinumScans](https://platinumscans.com)
-- [ResetScans](https://reset-scans.org)
 - [SamuraiScan](https://samurai.wordoco.com)
 - [SetsuScans](https://setsuscans.com)
 - [TheBlank](https://theblank.net)
