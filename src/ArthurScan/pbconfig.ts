@@ -9,7 +9,7 @@ let pbConfig = basePbConfig;
 
 pbConfig.name = "ArthurScan";
 pbConfig.description = "Extension that pulls content from arthurscan.xyz.";
-pbConfig.version = customVersion({ increasePrerelease: 1 });
+pbConfig.version = customVersion({ increasePrerelease: 2 });
 pbConfig.language = "pt";
 pbConfig.contentRating = ContentRating.MATURE;
 
