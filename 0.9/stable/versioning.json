@@ -1,5 +1,5 @@
 {
-  "buildTime": "2026-06-28T07:26:51.898Z",
+  "buildTime": "2026-06-28T07:28:36.751Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.92",
     "types": "1.0.0-alpha.92"
@@ -656,30 +656,6 @@
         }
       ],
       "id": "PlatinumScans"
-    },
-    {
-      "name": "ResetScans",
-      "description": "Extension that pulls content from reset-scans.org.",
-      "version": "1.0.0-alpha.14",
-      "icon": "icon.png",
-      "language": "en",
-      "contentRating": "SAFE",
-      "capabilities": [
-        1,
-        16,
-        4,
-        32,
-        64
-      ],
-      "badges": [],
-      "developers": [
-        {
-          "name": "Inkdex",
-          "website": "https://inkdex.github.io",
-          "github": "https://github.com/inkdex"
-        }
-      ],
-      "id": "ResetScans"
     },
     {
       "name": "SamuraiScan",
