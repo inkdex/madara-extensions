@@ -504,19 +504,15 @@ export abstract class MadaraGeneric
     let slug: string = "";
 
     if (!isPostId) {
-      if (getUsePostIds()) {
-        // If provided mangaId is NOT a postId, but a slug AND we care about having the postId
-        const slugInput = mangaId.toString();
+      // mangaId is already the slug
+      slug = mangaId.toString();
 
-        // Fetch postId for slug
-        postId = Application.getState(slugInput) as number;
-
-        // If unable to fetch postId, turn slug into postId
+      // Only resolve the postId when this source actually uses post IDs
+      if (getUsePostIds(this.usePostIds)) {
+        postId = Application.getState(slug) as number;
         if (!postId) {
-          postId = await this.convertSlugToPostId(slugInput);
+          postId = await this.convertSlugToPostId(slug);
         }
-
-        slug = slugInput;
       }
     } else {
       // If mangaId IS a postId
@@ -534,7 +530,7 @@ export abstract class MadaraGeneric
     }
 
     // We only need to store these if we actually care about them
-    if (getUsePostIds()) {
+    if (getUsePostIds(this.usePostIds)) {
       Application.setState(postId.toString(), slug);
       Application.setState(slug, postId.toString());
     }
