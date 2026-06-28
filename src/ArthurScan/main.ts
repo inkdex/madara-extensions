@@ -2,6 +2,7 @@
 /* Copyright © 2026 Inkdex */
 
 import { MadaraGeneric } from "../generic/main";
+import { ArthurScanParser } from "./parsers";
 import pbconfig from "./pbconfig";
 
 const DOMAIN: string = "https://arthurscan.xyz";
@@ -15,6 +16,8 @@ class ArthurScanExtension extends MadaraGeneric {
       language: pbconfig.language,
       usePostIds: true,
       chapterEndpoint: 1,
+      searchMangaSelector: "div.manga__item",
+      parser: new ArthurScanParser(),
     });
   }
 }
