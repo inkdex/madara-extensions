@@ -17,14 +17,8 @@ import pbconfig from "./pbconfig";
 
 const DOMAIN: string = "https://utoon.net";
 
-/**
- * UToon runs the custom "UTOON-ZAX" theme, but the standard WordPress request
- * flow is intact: search (`?s=…&post_type=wp-manga`), manga details and the
- * chapter list all live at the usual URLs, so the requests are handled by the
- * generic base and the markup is parsed by `UToonParser`. Discover reuses the
- * generic sections and flow as well, only swapping in the theme's `?orderby=`
- * sort params.
- */
+// utoon.net runs the custom "UTOON-ZAX" theme: the standard Madara request flow is intact,
+// so only the markup parsing (UToonParser) and the discover `?orderby=` sort params differ.
 class UToonExtension extends MadaraGeneric {
   constructor() {
     super({
@@ -47,9 +41,7 @@ class UToonExtension extends MadaraGeneric {
     let param = "";
     const page = metadata?.page ?? 1;
 
-    // The custom theme sorts via `?orderby=<id>` (it ignores Madara's `m_orderby`)
-    // and only supports popular/new/alphabet, so the generic section ids are mapped
-    // onto those — "currently_trending" has no equivalent and reuses "popular".
+    // The theme sorts via `?orderby=` (not Madara's `m_orderby`) and only supports popular/new, so trending reuses popular.
     switch (section.id) {
       case "new_series":
         param = "?orderby=new";

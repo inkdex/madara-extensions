@@ -14,16 +14,9 @@ import type { CheerioAPI } from "cheerio";
 
 import { MadaraGeneric } from "../generic/main";
 import { MadaraParser } from "../generic/parsers";
-import { mergeAlternativeNames, parseSynopsis } from "./utils";
+import { BOOK_TYPES, type BookType, type ParsedSynopsis } from "./models";
 
-/**
- * UToon runs the custom "UTOON-ZAX" theme. The standard WordPress request flow is
- * intact (search, manga details and the chapter page all live at the usual URLs),
- * so only the parsing differs — search, details and the chapter list are overridden
- * here, while the generic base drives the requests.
- */
 export class UToonParser extends MadaraParser {
-  /** Search and discover share `a.acard` cards on the `/manga/` listings. */
   override async parseSearchResults($: CheerioAPI, source: MadaraGeneric) {
     const results: {
       slug: string;
@@ -60,7 +53,6 @@ export class UToonParser extends MadaraParser {
     return results;
   }
 
-  /** Discover browse listings render the same `a.acard` cards as search. */
   override async parseDiscoverSections(
     $: CheerioAPI,
     section: DiscoverSection,
@@ -103,7 +95,6 @@ export class UToonParser extends MadaraParser {
     return items;
   }
 
-  /** Details use the custom theme's markup (h1.htitle, div.sinfo-grid, etc.). */
   override async parseMangaDetails(
     $: CheerioAPI,
     mangaId: string,
@@ -133,8 +124,6 @@ export class UToonParser extends MadaraParser {
     }
     thumbnailUrl = encodeURI(thumbnailUrl);
 
-    // The synopsis is prefixed with a "Read <BookType> <alt names>" header; split
-    // it into the book types, alternative names and the actual description.
     const parsed = parseSynopsis(
       Application.decodeHTMLEntities($("div.syn, #syn").first().text().trim()),
     );
@@ -144,7 +133,6 @@ export class UToonParser extends MadaraParser {
       parsed.alternativeNames,
     ).filter((title) => title.toLowerCase() !== primaryTitle.toLowerCase());
 
-    // Info grid: <div class="sir"><span class="l">label</span><span class="v">value</span></div>
     const info: Record<string, string> = {};
     $("div.sinfo-grid div.sir").each((_, el) => {
       const label = $(el).find("span.l").text().trim().toLowerCase();
@@ -159,7 +147,6 @@ export class UToonParser extends MadaraParser {
         ? Application.decodeHTMLEntities(info["author"])
         : "";
 
-    // Genres, plus the series type (e.g. Manhwa).
     const genreTags: Tag[] = [];
     const seenGenre = new Set<string>();
     const pushGenre = (name: string): void => {
@@ -180,7 +167,6 @@ export class UToonParser extends MadaraParser {
     if (info["type"]) {
       pushGenre(info["type"]);
     }
-    // The book type(s) parsed from the synopsis header (e.g. Manhwa, Manhua).
     for (const bookType of parsed.bookTypes) {
       pushGenre(bookType);
     }
@@ -210,11 +196,7 @@ export class UToonParser extends MadaraParser {
     };
   }
 
-  /**
-   * The custom theme embeds the full chapter list as a `var CH=[...]` array on the
-   * manga page (the DOM only holds the first page of rows). Locked (premium)
-   * chapters are skipped. Falls back to the classic Madara markup if it is absent.
-   */
+  // The full list lives in a `var CH=[...]` array (the DOM has only the first page); falls back to Madara markup.
   override parseChapterList(
     $: CheerioAPI,
     sourceManga: SourceManga,
@@ -306,4 +288,85 @@ export class UToonParser extends MadaraParser {
         return "Ongoing";
     }
   }
+}
+
+// Splits an optional "Read <BookType>... <AltName>..." header from the body; no header means it's all synopsis.
+export function parseSynopsis(synopsisText: string): ParsedSynopsis {
+  const lines = synopsisText.split("\n");
+  const firstLine = lines[0].trim();
+
+  const readMatch = firstLine.match(/^Read\s+(.+)$/);
+  if (!readMatch) {
+    return { bookTypes: [], alternativeNames: [], synopsis: synopsisText.trim() };
+  }
+
+  const parts = readMatch[1].split(/\s*\/\s*/);
+
+  const bookTypes: BookType[] = [];
+  const alternativeNames: string[] = [];
+
+  for (const part of parts) {
+    const token = part.trim();
+    if (!token) continue;
+
+    let recognized = false;
+
+    // BOOK_TYPES order matters: MangaToon must be matched before Manga.
+    for (const bookType of BOOK_TYPES) {
+      if (token === bookType) {
+        if (!bookTypes.includes(bookType)) bookTypes.push(bookType);
+        recognized = true;
+        break;
+      }
+
+      if (token.startsWith(`${bookType} `)) {
+        // Book type and the first alt name share one token, e.g. "Manhwa The Great Mage".
+        if (!bookTypes.includes(bookType)) bookTypes.push(bookType);
+        const altName = token.slice(bookType.length).trim();
+        if (altName) alternativeNames.push(altName);
+        recognized = true;
+        break;
+      }
+    }
+
+    if (!recognized) {
+      alternativeNames.push(token);
+    }
+  }
+
+  // A blank line separates header from body; without one, the body starts right after the header.
+  let synopsisStartIndex = -1;
+  for (let i = 1; i < lines.length; i++) {
+    if (lines[i].trim() === "") {
+      synopsisStartIndex = i + 1;
+      break;
+    }
+  }
+  if (synopsisStartIndex === -1) {
+    synopsisStartIndex = lines.length > 1 ? 1 : lines.length;
+  }
+
+  const synopsis = lines.slice(synopsisStartIndex).join("\n").trim();
+
+  return { bookTypes, alternativeNames, synopsis };
+}
+
+function normalizeTitle(title: string): string {
+  return title.trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+/** Appends `parsedNames` to `existingNames`, deduplicating case- and whitespace-insensitively. */
+export function mergeAlternativeNames(existingNames: string[], parsedNames: string[]): string[] {
+  const seen = new Set(existingNames.map(normalizeTitle));
+  const merged = [...existingNames];
+
+  for (const name of parsedNames) {
+    const key = normalizeTitle(name);
+    if (!seen.has(key)) {
+      seen.add(key);
+      merged.push(name); // push the original, not the normalized key, to keep casing
+    }
+  }
+
+  return merged;
 }
