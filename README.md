@@ -33,7 +33,6 @@ Paperback extensions for websites which use the generic Madara theme.
 - [PlatinumScans](https://platinumscans.com)
 - [SamuraiScan](https://samurai.wordoco.com)
 - [SetsuScans](https://setsuscans.com)
-- [TheBlank](https://theblank.net)
 - [ToonGod](https://toongod.com)
 - [Toonily](https://toonily.com)
 - [UToon](https://utoon.net)
