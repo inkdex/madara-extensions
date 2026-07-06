@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 /* Copyright © 2026 Inkdex */
 
-import { URL, type SearchQuery } from "@paperback/types";
+import { URL, type SearchQuery, type SortingOption } from "@paperback/types";
 
 import { MadaraGeneric } from "../generic/main";
 import type { MadaraSearchMetadata } from "../generic/models";
@@ -22,7 +22,11 @@ class ToonilyExtension extends MadaraGeneric {
     });
   }
 
-  override constructSearchRequest(page: number, query: SearchQuery<MadaraSearchMetadata>) {
+  override constructSearchRequest(
+    page: number,
+    query: SearchQuery<MadaraSearchMetadata>,
+    sortingOption?: SortingOption,
+  ) {
     const urlBuilder = new URL(this.domain)
       .addPathComponent(
         `search/${query?.title ? this.sanitizeQuery(query.title).replaceAll(" ", "-") + "/" : ""}page/${page.toString()}`,
@@ -34,6 +38,10 @@ class ToonilyExtension extends MadaraGeneric {
     if (genreFilters.length) {
       genreFilters.forEach((genre, i) => urlBuilder.setQueryItem(`genre[${i}]`, genre));
       urlBuilder.setQueryItem("op", "1");
+    }
+
+    if (sortingOption && sortingOption.id !== "relevance") {
+      urlBuilder.setQueryItem("m_orderby", sortingOption.id);
     }
 
     return Application.scheduleRequest({

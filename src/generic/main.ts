@@ -19,6 +19,7 @@ import {
   type Request,
   type SearchQuery,
   type SearchResultItem,
+  type SortingOption,
   type SourceManga,
   type Tag,
   type TagSection,
@@ -27,7 +28,7 @@ import * as cheerio from "cheerio";
 
 import type { basePbConfig } from "./config";
 import { getUsePostIds, MadaraSearchForm, MadaraSettings } from "./forms";
-import type { MadaraSearchMetadata } from "./models";
+import { SORTING_OPTIONS, type MadaraSearchMetadata } from "./models";
 import { MadaraInterceptor } from "./network";
 import { MadaraParser } from "./parsers";
 
@@ -384,13 +385,18 @@ export abstract class MadaraGeneric implements ExtensionImpl<typeof basePbConfig
     return new MadaraSearchForm(query.metadata, this.fetchGenres());
   }
 
+  async getSortingOptions(): Promise<SortingOption[]> {
+    return SORTING_OPTIONS;
+  }
+
   async getSearchResults(
     query: SearchQuery<MadaraSearchMetadata>,
     metadata: Metadata | undefined,
+    sortingOption: SortingOption | undefined,
   ): Promise<PagedResults<SearchResultItem>> {
     const page = metadata?.page ?? 1;
 
-    const [_response, buffer] = await this.constructSearchRequest(page, query);
+    const [_response, buffer] = await this.constructSearchRequest(page, query, sortingOption);
 
     if (_response.status === 404) {
       return { items: [], metadata: undefined }; // Madara doesn't support last page checking, will return 404 on website!
@@ -439,7 +445,11 @@ export abstract class MadaraGeneric implements ExtensionImpl<typeof basePbConfig
   }
 
   // Utility
-  constructSearchRequest(page: number, query: SearchQuery<MadaraSearchMetadata>) {
+  constructSearchRequest(
+    page: number,
+    query: SearchQuery<MadaraSearchMetadata>,
+    sortingOption?: SortingOption,
+  ) {
     const urlBuilder = new URL(this.domain)
       .addPathComponent(this.searchPagePathName)
       .addPathComponent(page.toString())
@@ -451,6 +461,10 @@ export abstract class MadaraGeneric implements ExtensionImpl<typeof basePbConfig
     if (genreFilters.length) {
       genreFilters.forEach((genre, i) => urlBuilder.setQueryItem(`genre[${i}]`, genre));
       urlBuilder.setQueryItem("op", "1");
+    }
+
+    if (sortingOption && sortingOption.id !== "relevance") {
+      urlBuilder.setQueryItem("m_orderby", sortingOption.id);
     }
 
     return Application.scheduleRequest({
