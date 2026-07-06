@@ -406,25 +406,15 @@ export abstract class MadaraGeneric implements ExtensionImpl<typeof basePbConfig
 
     const results = await this.parser.parseSearchResults($, this);
 
-    const items: SearchResultItem[] = [];
-
-    for (const result of results) {
-      if (getUsePostIds(this.usePostIds)) {
-        items.push({
-          mangaId: (await this.getPostAndSlug(result.slug)).postId,
-          imageUrl: result.image,
-          title: result.title,
-          subtitle: result.subtitle,
-        });
-      } else {
-        items.push({
-          mangaId: result.slug,
-          imageUrl: result.image,
-          title: result.title,
-          subtitle: result.subtitle,
-        });
-      }
-    }
+    const usePostIds = getUsePostIds(this.usePostIds);
+    const items: SearchResultItem[] = await Promise.all(
+      results.map(async (result) => ({
+        mangaId: usePostIds ? (await this.getPostAndSlug(result.slug)).postId : result.slug,
+        imageUrl: result.image,
+        title: result.title,
+        subtitle: result.subtitle,
+      })),
+    );
 
     return {
       items: items,
