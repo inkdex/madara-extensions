@@ -8,7 +8,7 @@ import { basePbConfig } from "../generic/config";
 let pbConfig = basePbConfig;
 
 pbConfig.name = "SamuraiScan";
-pbConfig.description = "Extension that pulls content from samurai.wordoco.com.";
+pbConfig.description = "Extension that pulls content from samurai.j5z.xyz.";
 pbConfig.language = "es";
 pbConfig.contentRating = ContentRating.MATURE;
 

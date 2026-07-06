@@ -6,7 +6,7 @@ import { basePbConfig } from "../generic/config";
 let pbConfig = basePbConfig;
 
 pbConfig.name = "LekManga";
-pbConfig.description = "Extension that pulls content from lekmanga.net.";
+pbConfig.description = "Extension that pulls content from mangalik.net.";
 pbConfig.language = "ar";
 
 export default pbConfig;

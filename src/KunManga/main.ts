@@ -4,7 +4,7 @@
 import { MadaraGeneric } from "../generic/main";
 import pbconfig from "./pbconfig";
 
-const DOMAIN: string = "https://kunmanga.com";
+const DOMAIN: string = "https://kunmanga.co.uk";
 
 class KunMangaExtension extends MadaraGeneric {
   constructor() {

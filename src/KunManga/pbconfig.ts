@@ -6,6 +6,6 @@ import { basePbConfig } from "../generic/config";
 let pbConfig = basePbConfig;
 
 pbConfig.name = "KunManga";
-pbConfig.description = "Extension that pulls content from kunmanga.com.";
+pbConfig.description = "Extension that pulls content from kunmanga.co.uk.";
 
 export default pbConfig;

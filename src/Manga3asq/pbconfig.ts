@@ -6,7 +6,7 @@ import { basePbConfig } from "../generic/config";
 let pbConfig = basePbConfig;
 
 pbConfig.name = "Manga3asq";
-pbConfig.description = "Extension that pulls content from 3asq.org.";
+pbConfig.description = "Extension that pulls content from 3asq.pro.";
 pbConfig.language = "ar";
 
 export default pbConfig;

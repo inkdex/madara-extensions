@@ -5,7 +5,7 @@ import { MadaraGeneric } from "../generic/main";
 import { Manga3asqParser } from "./parsers";
 import pbconfig from "./pbconfig";
 
-const DOMAIN: string = "https://3asq.org";
+const DOMAIN: string = "https://3asq.pro";
 
 class Manga3asqExtension extends MadaraGeneric {
   constructor() {

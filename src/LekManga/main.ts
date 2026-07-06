@@ -5,7 +5,7 @@ import { MadaraGeneric } from "../generic/main";
 import { LekMangaParser } from "./parsers";
 import pbconfig from "./pbconfig";
 
-const DOMAIN: string = "https://lekmanga.net";
+const DOMAIN: string = "https://mangalik.net";
 
 class LekMangaExtension extends MadaraGeneric {
   constructor() {

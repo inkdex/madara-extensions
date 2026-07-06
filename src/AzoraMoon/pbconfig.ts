@@ -6,7 +6,7 @@ import { basePbConfig } from "../generic/config";
 let pbConfig = basePbConfig;
 
 pbConfig.name = "AzoraMoon";
-pbConfig.description = "Extension that pulls content from azoramoon.com.";
+pbConfig.description = "Extension that pulls content from azorafly.com.";
 pbConfig.language = "ar";
 
 export default pbConfig;

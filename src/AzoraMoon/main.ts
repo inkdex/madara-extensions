@@ -5,7 +5,7 @@ import { MadaraGeneric } from "../generic/main";
 import { AzoraMoonParser } from "./parsers";
 import pbconfig from "./pbconfig";
 
-const DOMAIN: string = "https://azoramoon.com";
+const DOMAIN: string = "https://azorafly.com";
 
 class AzoraMoonExtension extends MadaraGeneric {
   constructor() {

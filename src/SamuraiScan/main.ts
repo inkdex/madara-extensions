@@ -4,7 +4,7 @@
 import { MadaraGeneric } from "../generic/main";
 import pbconfig from "./pbconfig";
 
-const DOMAIN: string = "https://samurai.wordoco.com";
+const DOMAIN: string = "https://samurai.j5z.xyz";
 
 class SamuraiScanExtension extends MadaraGeneric {
   constructor() {
