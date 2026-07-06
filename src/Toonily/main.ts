@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 /* Copyright © 2026 Inkdex */
 
-import { type SearchQuery, URL } from "@paperback/types";
-import type { SearchFilterValue } from "@paperback/types/lib/compat/0.8/searchFilters";
+import { URL, type SearchQuery } from "@paperback/types";
 
 import { MadaraGeneric } from "../generic/main";
+import type { MadaraSearchMetadata } from "../generic/models";
 import pbconfig from "./pbconfig";
 
 const DOMAIN: string = "https://toonily.com";
@@ -22,16 +22,14 @@ class ToonilyExtension extends MadaraGeneric {
     });
   }
 
-  override constructSearchRequest(page: number, query: SearchQuery<SearchFilterValue[]>) {
+  override constructSearchRequest(page: number, query: SearchQuery<MadaraSearchMetadata>) {
     const urlBuilder = new URL(this.domain)
       .addPathComponent(
         `search/${query?.title ? this.sanitizeQuery(query.title).replaceAll(" ", "-") + "/" : ""}page/${page.toString()}`,
       )
       .setQueryItem("post_type", "wp-manga");
 
-    const genreFilters = Object.keys(
-      (query.metadata ?? []).find((x) => x.id === "genres")?.value ?? {},
-    );
+    const genreFilters = Object.keys(query.metadata?.genres ?? {});
 
     if (genreFilters.length) {
       genreFilters.forEach((genre, i) => urlBuilder.setQueryItem(`genre[${i}]`, genre));

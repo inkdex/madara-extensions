@@ -1,9 +1,83 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later */
 /* Copyright © 2026 Inkdex */
 
-import { ButtonRow, Form, LabelRow, Section, ToggleRow } from "@paperback/types";
+import {
+  AdvancedSearchForm,
+  ButtonRow,
+  closureSelector,
+  Form,
+  LabelRow,
+  Section,
+  ToggleRow,
+  TriStateSelectRow,
+  type FormSectionElement,
+  type Tag,
+} from "@paperback/types";
 
-import { MadaraGeneric } from "./main";
+import type { MadaraSearchMetadata } from "./models";
+
+export class MadaraSearchForm extends AdvancedSearchForm {
+  private genres?: Tag[] | Error;
+  private selectedGenres: Record<string, "included" | "excluded">;
+
+  constructor(metadata: MadaraSearchMetadata | undefined, genres: Promise<Tag[]>) {
+    super();
+    this.selectedGenres = metadata?.genres ?? {};
+
+    genres
+      .then((genres) => (this.genres = genres))
+      .catch((error) => (this.genres = error instanceof Error ? error : new Error(String(error))))
+      .finally(() => this.reloadForm());
+  }
+
+  override getSections(): FormSectionElement<unknown>[] {
+    if (!this.genres) {
+      return [Section("loading", [LabelRow("loading", { title: "Loading Filters" })])];
+    }
+
+    if (this.genres instanceof Error) {
+      return [
+        Section("error", [
+          LabelRow("error", {
+            title: "Error loading search filters",
+            subtitle: this.genres.message,
+          }),
+        ]),
+      ];
+    }
+
+    return [
+      Section({ id: "genres" }, [
+        TriStateSelectRow("genres", {
+          title: "Genres",
+          layout: "flow",
+          value: this.selectedGenres,
+          items: this.genres.map((tag) => ({ id: tag.id, title: tag.title })),
+          allowExclusion: false,
+          allowEmptySelection: true,
+          onValueChange: closureSelector(this, "genres", async (value) => {
+            this.selectedGenres = value;
+            this.reloadForm();
+          }),
+        }),
+      ]),
+    ];
+  }
+
+  override getSearchQueryMetadata(): MadaraSearchMetadata {
+    return { genres: this.selectedGenres };
+  }
+
+  override async formDidSubmit(): Promise<void> {
+    if (!this.genres) {
+      throw new Error("Search filters are loading");
+    }
+
+    if (this.genres instanceof Error) {
+      throw this.genres;
+    }
+  }
+}
 
 // Util
 function toBoolean(value: unknown): boolean | undefined {
@@ -41,15 +115,17 @@ export function getParsedPath(domain: string): string {
 }
 
 export class MadaraSettings extends Form {
-  source: MadaraGeneric;
-  constructor(source: MadaraGeneric) {
+  name: string;
+  domain: string;
+  constructor(name: string, domain: string) {
     super();
-    this.source = source;
+    this.name = name;
+    this.domain = domain;
   }
 
   override getSections() {
     return [
-      Section(`${this.source.name} Settings`.replaceAll(" ", ""), [
+      Section(`${this.name} Settings`.replaceAll(" ", ""), [
         ToggleRow("postIds", {
           title: "Use Post IDs",
           value: getUsePostIds(),
@@ -72,7 +148,7 @@ export class MadaraSettings extends Form {
         }),
         LabelRow("resetStateLabel", {
           title: "",
-          subtitle: `\nCurrent parsed path: "${getParsedPath(this.source.domain) ?? "overridden"}"\nClicking reset will reset the directory path.\nCan fix the homepage "request page not found" error!`,
+          subtitle: `\nCurrent parsed path: "${getParsedPath(this.domain) ?? "overridden"}"\nClicking reset will reset the directory path.\nCan fix the homepage "request page not found" error!`,
         }),
       ]),
     ];
@@ -87,6 +163,6 @@ export class MadaraSettings extends Form {
   }
 
   async resetDirectoryPath(): Promise<void> {
-    Application.setState(`dirpath_${this.source.domain}`, this.source.domain);
+    Application.setState(`dirpath_${this.domain}`, this.domain);
   }
 }

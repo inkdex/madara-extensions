@@ -20,17 +20,14 @@ import {
   type SearchQuery,
   type SearchResultItem,
   type SourceManga,
+  type Tag,
   type TagSection,
 } from "@paperback/types";
-import {
-  SearchFilterForm,
-  type SearchFilter,
-  type SearchFilterValue,
-} from "@paperback/types/lib/compat/0.8";
 import * as cheerio from "cheerio";
 
 import type { basePbConfig } from "./config";
-import { getUsePostIds, MadaraSettings } from "./forms";
+import { getUsePostIds, MadaraSearchForm, MadaraSettings } from "./forms";
+import type { MadaraSearchMetadata } from "./models";
 import { MadaraInterceptor } from "./network";
 import { MadaraParser } from "./parsers";
 
@@ -198,7 +195,7 @@ export abstract class MadaraGeneric implements ExtensionImpl<typeof basePbConfig
   }
 
   async getSettingsForm(): Promise<Form> {
-    return new MadaraSettings(this);
+    return new MadaraSettings(this.name, this.domain);
   }
 
   async getMangaDetails(mangaId: string): Promise<SourceManga> {
@@ -369,7 +366,7 @@ export abstract class MadaraGeneric implements ExtensionImpl<typeof basePbConfig
     };
   }
 
-  async getSearchFilters(): Promise<SearchFilter[]> {
+  async fetchGenres(): Promise<Tag[]> {
     const [_response, buffer] = await Application.scheduleRequest({
       url: `${this.domain}/?s=&post_type=wp-manga`,
       method: "GET",
@@ -380,30 +377,15 @@ export abstract class MadaraGeneric implements ExtensionImpl<typeof basePbConfig
     const tagSections = await this.parser.parseSearchTags($);
     const genreTags = tagSections.find((x) => x.id === "genres") as TagSection;
 
-    return [
-      {
-        type: "multiselect",
-        options: genreTags.tags.map((x) => ({
-          id: x.id,
-          value: x.title,
-        })),
-        id: genreTags.id,
-        allowExclusion: false,
-        title: genreTags.title,
-        value: {},
-        allowEmptySelection: true,
-        maximum: undefined,
-      },
-    ];
+    return genreTags.tags;
   }
 
-  async getAdvancedSearchForm(query: SearchQuery<SearchFilterValue[]>) {
-    // TODO: Replace compat wrapper with proper search form implementation
-    return new SearchFilterForm(query.metadata, this.getSearchFilters());
+  async getAdvancedSearchForm(query: SearchQuery<MadaraSearchMetadata>): Promise<MadaraSearchForm> {
+    return new MadaraSearchForm(query.metadata, this.fetchGenres());
   }
 
   async getSearchResults(
-    query: SearchQuery<SearchFilterValue[]>,
+    query: SearchQuery<MadaraSearchMetadata>,
     metadata: Metadata | undefined,
   ): Promise<PagedResults<SearchResultItem>> {
     const page = metadata?.page ?? 1;
@@ -457,16 +439,14 @@ export abstract class MadaraGeneric implements ExtensionImpl<typeof basePbConfig
   }
 
   // Utility
-  constructSearchRequest(page: number, query: SearchQuery<SearchFilterValue[]>) {
+  constructSearchRequest(page: number, query: SearchQuery<MadaraSearchMetadata>) {
     const urlBuilder = new URL(this.domain)
       .addPathComponent(this.searchPagePathName)
       .addPathComponent(page.toString())
       .setQueryItem("s", this.sanitizeQuery(query?.title ?? ""))
       .setQueryItem("post_type", "wp-manga");
 
-    const genreFilters = Object.keys(
-      (query.metadata ?? []).find((x) => x.id === "genres")?.value ?? {},
-    );
+    const genreFilters = Object.keys(query.metadata?.genres ?? {});
 
     if (genreFilters.length) {
       genreFilters.forEach((genre, i) => urlBuilder.setQueryItem(`genre[${i}]`, genre));
