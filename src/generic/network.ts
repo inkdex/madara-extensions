@@ -77,7 +77,10 @@ export class MadaraInterceptor extends PaperbackInterceptor {
     data: ArrayBuffer,
   ): Promise<ArrayBuffer> {
     const cfMitigated = response.headers?.["cf-mitigated"];
-    if (cfMitigated === "challenge") {
+    const isRecaptcha =
+      response.status === 403 && Application.arrayBufferToUTF8String(data).includes("recaptcha");
+
+    if (cfMitigated === "challenge" || isRecaptcha) {
       throw new CloudflareError(
         {
           url: this.source.bypassPage ? this.source.bypassPage : this.source.domain,
@@ -88,7 +91,7 @@ export class MadaraInterceptor extends PaperbackInterceptor {
             "user-agent": await Application.getDefaultUserAgent(),
           },
         },
-        "Cloudflare detected, bypass it to continue!",
+        "Bot verification detected, bypass it to continue!",
       );
     }
 
