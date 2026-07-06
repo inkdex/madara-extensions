@@ -3,30 +3,24 @@
 
 import {
   BasicRateLimiter,
+  ContentRating,
+  CookieStorageInterceptor,
+  DiscoverSectionType,
+  Form,
+  PaperbackInterceptor,
+  URL,
   type Chapter,
   type ChapterDetails,
-  type ChapterProviding,
-  type CloudflareBypassRequestProviding,
-  ContentRating,
   type Cookie,
-  CookieStorageInterceptor,
   type DiscoverSection,
   type DiscoverSectionItem,
-  type DiscoverSectionProviding,
-  DiscoverSectionType,
-  type Extension,
-  Form,
-  type MangaProviding,
+  type ExtensionImpl,
   type PagedResults,
-  PaperbackInterceptor,
   type Request,
   type SearchQuery,
   type SearchResultItem,
-  type SearchResultsProviding,
-  type SettingsFormProviding,
   type SourceManga,
   type TagSection,
-  URL,
 } from "@paperback/types";
 import {
   SearchFilterForm,
@@ -35,6 +29,7 @@ import {
 } from "@paperback/types/lib/compat/0.8";
 import * as cheerio from "cheerio";
 
+import type { basePbConfig } from "./config";
 import { getUsePostIds, MadaraSettings } from "./forms";
 import { MadaraInterceptor } from "./network";
 import { MadaraParser } from "./parsers";
@@ -65,16 +60,7 @@ type Metadata = {
   completed?: boolean;
 };
 
-export abstract class MadaraGeneric
-  implements
-    Extension,
-    SearchResultsProviding,
-    MangaProviding,
-    ChapterProviding,
-    DiscoverSectionProviding,
-    SettingsFormProviding,
-    CloudflareBypassRequestProviding
-{
+export abstract class MadaraGeneric implements ExtensionImpl<typeof basePbConfig> {
   /**
    * The Madara URL of the website. Eg. https://webtoon.xyz
    */
