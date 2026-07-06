@@ -6,7 +6,6 @@ Paperback extensions for websites which use the generic Madara theme.
 
 - [AllPornComic](https://allporncomic.com)
 - [ArthurScan](https://arthurscan.xyz)
-- [AzoraMoon](https://azorafly.com)
 - [CoffeeManga](https://coffeemanga.ink)
 - [DragonTea](https://dragontea.ink)
 - [GourmetScans](https://gourmetsupremacy.com)
