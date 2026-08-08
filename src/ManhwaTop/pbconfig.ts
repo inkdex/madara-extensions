@@ -3,12 +3,13 @@
 
 import { ContentRating } from "@paperback/types";
 
-import { basePbConfig } from "../generic/config";
+import { basePbConfig, customVersion } from "../generic/config";
 
 let pbConfig = basePbConfig;
 
 pbConfig.name = "ManhwaTop";
 pbConfig.description = "Extension that pulls content from manhwatop.com.";
+pbConfig.version = customVersion({ increasePrerelease: 1 });
 pbConfig.contentRating = ContentRating.MATURE;
 
 export default pbConfig;
