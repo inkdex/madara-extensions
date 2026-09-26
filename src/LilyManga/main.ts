@@ -13,8 +13,9 @@ class LilyMangaExtension extends MadaraGeneric {
       name: pbconfig.name,
       contentRating: pbconfig.contentRating,
       language: pbconfig.language,
-      usePostIds: true,
+      usePostIds: false,
       chapterEndpoint: 1,
+      directoryPath: "gl",
       searchMangaSelector: "div.page-item-detail",
     });
   }
