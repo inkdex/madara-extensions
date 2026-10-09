@@ -3,13 +3,14 @@
 
 import { ContentRating } from "@paperback/types";
 
-import { basePbConfig } from "../generic/config";
+import { basePbConfig, customVersion } from "../generic/config";
 
 let pbConfig = basePbConfig;
 
 pbConfig.name = "MangaOrigines";
 pbConfig.description = "Extension that pulls content from mangas-origines.fr.";
 pbConfig.language = "fr";
-pbConfig.contentRating = ContentRating.MATURE;
+pbConfig.contentRating = ContentRating.EVERYONE;
+pbConfig.version = customVersion({ increasePrerelease: 1 });
 
 export default pbConfig;
