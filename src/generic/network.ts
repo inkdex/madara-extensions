@@ -8,6 +8,7 @@ import {
   type Response,
 } from "@paperback/types";
 
+import { decodeHtml } from "./decode";
 import { MadaraGeneric } from "./main";
 
 export class MadaraInterceptor extends PaperbackInterceptor {
@@ -77,8 +78,7 @@ export class MadaraInterceptor extends PaperbackInterceptor {
     data: ArrayBuffer,
   ): Promise<ArrayBuffer> {
     const cfMitigated = response.headers?.["cf-mitigated"];
-    const isRecaptcha =
-      response.status === 403 && Application.arrayBufferToUTF8String(data).includes("recaptcha");
+    const isRecaptcha = response.status === 403 && decodeHtml(data).includes("recaptcha");
 
     if (cfMitigated === "challenge" || isRecaptcha) {
       throw new CloudflareError(
