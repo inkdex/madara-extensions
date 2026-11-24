@@ -117,22 +117,29 @@ export function getParsedPath(domain: string): string {
 export class MadaraSettings extends Form {
   name: string;
   domain: string;
-  constructor(name: string, domain: string) {
+  usePostIds: boolean;
+  constructor(name: string, domain: string, usePostIds: boolean) {
     super();
     this.name = name;
     this.domain = domain;
+    this.usePostIds = usePostIds;
   }
 
   override getSections() {
     return [
       Section(`${this.name} Settings`.replaceAll(" ", ""), [
-        ToggleRow("postIds", {
-          title: "Use Post IDs",
-          value: getUsePostIds(),
-          onValueChange: Application.Selector(this as MadaraSettings, "usePostIdsChange"),
-          subtitle:
-            "Enabling will make the source slower, but more reliable!\nCHANGING THIS OPTION WILL ERASE YOUR READING PROGRESS FOR THIS SOURCE!",
-        }),
+        // The source turned post IDs off, so the toggle would have no effect.
+        ...(this.usePostIds
+          ? [
+              ToggleRow("postIds", {
+                title: "Use Post IDs",
+                value: getUsePostIds(),
+                onValueChange: Application.Selector(this as MadaraSettings, "usePostIdsChange"),
+                subtitle:
+                  "Enabling will make the source slower, but more reliable!\nCHANGING THIS OPTION WILL ERASE YOUR READING PROGRESS FOR THIS SOURCE!",
+              }),
+            ]
+          : []),
 
         ToggleRow("hqThumbnails", {
           title: "Enable HQ Thumbnails",

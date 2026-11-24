@@ -11,6 +11,7 @@ import {
 } from "@paperback/types";
 import * as cheerio from "cheerio";
 
+import { decodeHtml } from "../generic/decode";
 import { MadaraGeneric } from "../generic/main";
 import { UToonParser } from "./parsers";
 import pbconfig from "./pbconfig";
@@ -63,7 +64,7 @@ class UToonExtension extends MadaraGeneric {
       method: "GET",
     });
 
-    const $ = cheerio.load(Application.arrayBufferToUTF8String(buffer));
+    const $ = cheerio.load(decodeHtml(buffer));
 
     const items = await this.parser.parseDiscoverSections($, section, this);
 

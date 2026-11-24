@@ -205,7 +205,7 @@ export abstract class MadaraGeneric implements ExtensionImpl<typeof basePbConfig
   }
 
   async getSettingsForm(): Promise<Form> {
-    return new MadaraSettings(this.name, this.domain);
+    return new MadaraSettings(this.name, this.domain, this.usePostIds);
   }
 
   async getMangaDetails(mangaId: string): Promise<SourceManga> {
@@ -222,7 +222,7 @@ export abstract class MadaraGeneric implements ExtensionImpl<typeof basePbConfig
 
   async getChapters(sourceManga: SourceManga): Promise<Chapter[]> {
     let requestConfig: Request;
-    const mangaId = await this.getPostAndSlug(sourceManga.mangaId);
+    const mangaId = await this.getPostAndSlug(sourceManga.mangaId, true);
 
     switch (this.chapterEndpoint) {
       case 0:
@@ -480,10 +480,12 @@ export abstract class MadaraGeneric implements ExtensionImpl<typeof basePbConfig
     return query.replace(/[‘’]/g, "'").replace(/[“”]/g, '"');
   }
 
-  async getPostAndSlug(mangaId: string) {
-    const isPostId = !isNaN(Number(mangaId));
+  async getPostAndSlug(mangaId: string, forChapterList = false) {
+    // A source with post IDs off stores slugs, and a slug can be all digits.
+    const isPostId = this.usePostIds && !isNaN(Number(mangaId));
     // The admin-ajax chapter endpoint needs the post ID even when manga IDs are slugs.
-    const needsPostId = getUsePostIds(this.usePostIds) || this.chapterEndpoint === 0;
+    const needsPostId =
+      getUsePostIds(this.usePostIds) || (forChapterList && this.chapterEndpoint === 0);
     let postId: number = 0;
     let slug: string = "";
 
@@ -492,7 +494,7 @@ export abstract class MadaraGeneric implements ExtensionImpl<typeof basePbConfig
       slug = mangaId.toString();
 
       if (needsPostId) {
-        postId = Number(Application.getState(slug));
+        postId = Number(Application.getState(`postid_${slug}`));
         if (!postId) {
           postId = await this.convertSlugToPostId(slug);
         }
@@ -502,7 +504,7 @@ export abstract class MadaraGeneric implements ExtensionImpl<typeof basePbConfig
       const postIdInput = Number(mangaId);
 
       // Fetch slug for postId
-      slug = Application.getState(postIdInput.toString()) as string;
+      slug = Application.getState(`slug_${postIdInput}`) as string;
 
       // If unable to fetch slug, turn postId into slug
       if (!slug) {
@@ -513,8 +515,8 @@ export abstract class MadaraGeneric implements ExtensionImpl<typeof basePbConfig
     }
 
     if (needsPostId) {
-      Application.setState(postId.toString(), slug);
-      Application.setState(slug, postId.toString());
+      Application.setState(postId.toString(), `postid_${slug}`);
+      Application.setState(slug, `slug_${postId}`);
     }
 
     return {
