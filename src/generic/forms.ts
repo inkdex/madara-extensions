@@ -170,6 +170,6 @@ export class MadaraSettings extends Form {
   }
 
   async resetDirectoryPath(): Promise<void> {
-    Application.setState(`dirpath_${this.domain}`, this.domain);
+    Application.setState("", `dirpath_${this.domain}`);
   }
 }

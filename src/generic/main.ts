@@ -212,7 +212,7 @@ export abstract class MadaraGeneric implements ExtensionImpl<typeof basePbConfig
     const [_response, buffer] = await Application.scheduleRequest({
       url: getUsePostIds(this.usePostIds)
         ? `${this.domain}/?p=${mangaId}/`
-        : `${this.domain}/temp_dirpath/${mangaId}/`,
+        : `${this.domain}/temp_dirpath/${(await this.getPostAndSlug(mangaId)).slug}/`,
       method: "GET",
     });
 
@@ -481,16 +481,13 @@ export abstract class MadaraGeneric implements ExtensionImpl<typeof basePbConfig
   }
 
   async getPostAndSlug(mangaId: string, forChapterList = false) {
-    // A source with post IDs off stores slugs, and a slug can be all digits.
-    const isPostId = this.usePostIds && !isNaN(Number(mangaId));
+    const usePostIds = getUsePostIds(this.usePostIds);
     // The admin-ajax chapter endpoint needs the post ID even when manga IDs are slugs.
-    const needsPostId =
-      getUsePostIds(this.usePostIds) || (forChapterList && this.chapterEndpoint === 0);
+    const needsPostId = usePostIds || (forChapterList && this.chapterEndpoint === 0);
     let postId: number = 0;
     let slug: string = "";
 
-    if (!isPostId) {
-      // mangaId is already the slug
+    if (isNaN(Number(mangaId)) || (!usePostIds && (await this.isSlug(mangaId)))) {
       slug = mangaId.toString();
 
       if (needsPostId) {
@@ -500,21 +497,15 @@ export abstract class MadaraGeneric implements ExtensionImpl<typeof basePbConfig
         }
       }
     } else {
-      // If mangaId IS a postId
-      const postIdInput = Number(mangaId);
-
-      // Fetch slug for postId
-      slug = Application.getState(`slug_${postIdInput}`) as string;
-
-      // If unable to fetch slug, turn postId into slug
+      // A post ID, possibly saved before the source turned post IDs off.
+      postId = Number(mangaId);
+      slug = Application.getState(`slug_${postId}`) as string;
       if (!slug) {
-        slug = (await this.convertPostIdToSlug(postIdInput)).slug;
+        slug = (await this.convertPostIdToSlug(postId)).slug;
       }
-
-      postId = postIdInput;
     }
 
-    if (needsPostId) {
+    if (postId) {
       Application.setState(postId.toString(), `postid_${slug}`);
       Application.setState(slug, `slug_${postId}`);
     }
@@ -523,6 +514,20 @@ export abstract class MadaraGeneric implements ExtensionImpl<typeof basePbConfig
       postId: postId.toString(),
       slug: slug,
     };
+  }
+
+  // With slug IDs, an all-digit ID is either a slug or a post ID saved while post IDs were on.
+  private async isSlug(mangaId: string): Promise<boolean> {
+    if (Application.getState(`postid_${mangaId}`)) return true;
+    if (Application.getState(`slug_${mangaId}`)) return false;
+
+    try {
+      const postId = await this.convertSlugToPostId(mangaId);
+      Application.setState(postId.toString(), `postid_${mangaId}`);
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   async convertPostIdToSlug(postId: number) {
@@ -543,7 +548,7 @@ export abstract class MadaraGeneric implements ExtensionImpl<typeof basePbConfig
     }
 
     if (!parseURL.includes(this.domain)) {
-      throw new Error(`Unable to parse slug for postId: ${postId}!`);
+      return this.convertPostIdToSlugFromChapters(postId);
     }
 
     const URLSplit = parseURL.replace(/\/$/, "").split("/");
@@ -553,6 +558,29 @@ export abstract class MadaraGeneric implements ExtensionImpl<typeof basePbConfig
 
     if (!slug) {
       throw new Error(`Unable to fetch slug for this item! postId: ${postId}`);
+    }
+
+    return { path, slug };
+  }
+
+  // Some sites (manhwaclub.net) no longer answer ?p=<postId>, but admin-ajax still lists the
+  // chapters for a post ID, and each chapter URL is /<path>/<slug>/<chapter>/.
+  async convertPostIdToSlugFromChapters(postId: number) {
+    const [, buffer] = await Application.scheduleRequest({
+      url: `${this.domain}/wp-admin/admin-ajax.php`,
+      method: "POST",
+      headers: { "content-type": "application/x-www-form-urlencoded" },
+      body: `action=manga_get_chapters&manga=${postId}`,
+    });
+
+    const $ = cheerio.load(decodeHtml(buffer));
+    const href = $("li.wp-manga-chapter a").first().attr("href") ?? "";
+    const parts = href.replace(/\/$/, "").split("/");
+    const slug = parts[parts.length - 2];
+    const path = parts[parts.length - 3];
+
+    if (!href.includes(this.domain) || !slug || !path) {
+      throw new Error(`Unable to parse slug for postId: ${postId}!`);
     }
 
     return { path, slug };
