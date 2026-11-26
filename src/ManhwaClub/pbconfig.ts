@@ -9,7 +9,7 @@ let pbConfig = basePbConfig;
 
 pbConfig.name = "ManhwaClub";
 pbConfig.description = "Extension that pulls content from manhwaclub.net.";
-pbConfig.version = customVersion({ increasePrerelease: -11 });
+pbConfig.version = customVersion({ increasePrerelease: -10 });
 pbConfig.contentRating = ContentRating.ADULT;
 
 export default pbConfig;
