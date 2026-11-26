@@ -14,7 +14,7 @@ class ManhwaClubExtension extends MadaraGeneric {
       contentRating: pbconfig.contentRating,
       language: pbconfig.language,
       usePostIds: true,
-      chapterEndpoint: 0,
+      chapterEndpoint: 1,
     });
   }
 }
